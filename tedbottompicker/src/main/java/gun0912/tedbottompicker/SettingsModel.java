@@ -9,36 +9,34 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-public class Builder implements Parcelable {
+public class SettingsModel implements Parcelable {
 
     public static final String BUILDER_KEY = "BUILDER_KEY";
-
     public static final String URL_KEY = "URL_KEY";
-
     public static final int REQUEST_CODE = 112233;
 
-//    public Context context;
+    //    public Context context;
     public int previewMaxCount = 25;
-    public Drawable cameraTileDrawable;
-    public Drawable galleryTileDrawable;
-//
+    @DrawableRes
+    public int iconCamera;
+    @DrawableRes
+    public int iconGallery;
+    //
     public Drawable deSelectIconDrawable;
     public Drawable selectedForegroundDrawable;
 
     public int spacing = 1;
     public boolean includeEdgeSpacing = false;
-//    public TedBottomPicker.OnImageSelectedListener onImageSelectedListener;
+    //    public TedBottomPicker.OnImageSelectedListener onImageSelectedListener;
 //    public TedBottomPicker.OnMultiImageSelectedListener onMultiImageSelectedListener;
 //    public TedBottomPicker.OnErrorListener onErrorListener;
     public TedBottomPicker.ImageProvider imageProvider;
@@ -64,10 +62,12 @@ public class Builder implements Parcelable {
     ArrayList<Uri> selectedUriList;
     Uri selectedUri;
 
-    public Builder() {
+    public SettingsModel() {
+        iconCamera = R.drawable.ic_camera;
+        iconGallery = R.drawable.ic_gallery;
     }
 
-//    public Builder(@NonNull Context context) {
+//    public SettingsModel(@NonNull Context context) {
 //
 //        this.context = context;
 //
@@ -76,52 +76,52 @@ public class Builder implements Parcelable {
 //        setSpacingResId(R.dimen.tedbottompicker_grid_layout_margin);
 //    }
 
-//    public Builder setCameraTile(@DrawableRes int cameraTileResId) {
+//    public SettingsModel setCameraTile(@DrawableRes int cameraTileResId) {
 //        setCameraTile(ContextCompat.getDrawable(context, cameraTileResId));
 //        return this;
 //    }
 //
-//    public Builder setGalleryTile(@DrawableRes int galleryTileResId) {
+//    public SettingsModel setGalleryTile(@DrawableRes int galleryTileResId) {
 //        setGalleryTile(ContextCompat.getDrawable(context, galleryTileResId));
 //        return this;
 //    }
 //
-//    public Builder setSpacingResId(@DimenRes int dimenResId) {
+//    public SettingsModel setSpacingResId(@DimenRes int dimenResId) {
 //        this.spacing = context.getResources().getDimensionPixelSize(dimenResId);
 //        return this;
 //    }
 
-//    public Builder setCameraTile(Drawable cameraTileDrawable) {
+//    public SettingsModel setCameraTile(Drawable cameraTileDrawable) {
 //        this.cameraTileDrawable = cameraTileDrawable;
 //        return this;
 //    }
 //
-//    public Builder setGalleryTile(Drawable galleryTileDrawable) {
+//    public SettingsModel setGalleryTile(Drawable galleryTileDrawable) {
 //        this.galleryTileDrawable = galleryTileDrawable;
 //        return this;
 //    }
 
-//    public Builder setDeSelectIcon(@DrawableRes int deSelectIconResId) {
+//    public SettingsModel setDeSelectIcon(@DrawableRes int deSelectIconResId) {
 //        setDeSelectIcon(ContextCompat.getDrawable(context, deSelectIconResId));
 //        return this;
 //    }
 
-//    public Builder setDeSelectIcon(Drawable deSelectIconDrawable) {
+//    public SettingsModel setDeSelectIcon(Drawable deSelectIconDrawable) {
 //        this.deSelectIconDrawable = deSelectIconDrawable;
 //        return this;
 //    }
 //
-//    public Builder setSelectedForeground(@DrawableRes int selectedForegroundResId) {
+//    public SettingsModel setSelectedForeground(@DrawableRes int selectedForegroundResId) {
 //        setSelectedForeground(ContextCompat.getDrawable(context, selectedForegroundResId));
 //        return this;
 //    }
 
-//    public Builder setSelectedForeground(Drawable selectedForegroundDrawable) {
+//    public SettingsModel setSelectedForeground(Drawable selectedForegroundDrawable) {
 //        this.selectedForegroundDrawable = selectedForegroundDrawable;
 //        return this;
 //    }
 
-    protected Builder(Parcel in) {
+    protected SettingsModel(Parcel in) {
         previewMaxCount = in.readInt();
         spacing = in.readInt();
         includeEdgeSpacing = in.readByte() != 0;
@@ -173,164 +173,164 @@ public class Builder implements Parcelable {
         return 0;
     }
 
-    public static final Creator<Builder> CREATOR = new Creator<Builder>() {
+    public static final Creator<SettingsModel> CREATOR = new Creator<SettingsModel>() {
         @Override
-        public Builder createFromParcel(Parcel in) {
-            return new Builder(in);
+        public SettingsModel createFromParcel(Parcel in) {
+            return new SettingsModel(in);
         }
 
         @Override
-        public Builder[] newArray(int size) {
-            return new Builder[size];
+        public SettingsModel[] newArray(int size) {
+            return new SettingsModel[size];
         }
     };
 
-    public Builder setPreviewMaxCount(int previewMaxCount) {
+    public SettingsModel setPreviewMaxCount(int previewMaxCount) {
         this.previewMaxCount = previewMaxCount;
         return this;
     }
 
-    public Builder setSelectMaxCount(int selectMaxCount) {
+    public SettingsModel setSelectMaxCount(int selectMaxCount) {
         this.selectMaxCount = selectMaxCount;
         return this;
     }
 
-    public Builder setSelectMinCount(int selectMinCount) {
+    public SettingsModel setSelectMinCount(int selectMinCount) {
         this.selectMinCount = selectMinCount;
         return this;
     }
 
-//    public Builder setOnImageSelectedListener(TedBottomPicker.OnImageSelectedListener onImageSelectedListener) {
+//    public SettingsModel setOnImageSelectedListener(TedBottomPicker.OnImageSelectedListener onImageSelectedListener) {
 //        this.onImageSelectedListener = onImageSelectedListener;
 //        return this;
 //    }
 //
-//    public Builder setOnMultiImageSelectedListener(TedBottomPicker.OnMultiImageSelectedListener onMultiImageSelectedListener) {
+//    public SettingsModel setOnMultiImageSelectedListener(TedBottomPicker.OnMultiImageSelectedListener onMultiImageSelectedListener) {
 //        this.onMultiImageSelectedListener = onMultiImageSelectedListener;
 //        return this;
 //    }
 
-//    public Builder setOnErrorListener(TedBottomPicker.OnErrorListener onErrorListener) {
+//    public SettingsModel setOnErrorListener(TedBottomPicker.OnErrorListener onErrorListener) {
 //        this.onErrorListener = onErrorListener;
 //        return this;
 //    }
 
-    public Builder showCameraTile(boolean showCamera) {
+    public SettingsModel showCameraTile(boolean showCamera) {
         this.showCamera = showCamera;
         return this;
     }
 
-    public Builder showGalleryTile(boolean showGallery) {
+    public SettingsModel showGalleryTile(boolean showGallery) {
         this.showGallery = showGallery;
         return this;
     }
 
-    public Builder setSpacing(int spacing) {
+    public SettingsModel setSpacing(int spacing) {
         this.spacing = spacing;
         return this;
     }
 
-    public Builder setIncludeEdgeSpacing(boolean includeEdgeSpacing){
+    public SettingsModel setIncludeEdgeSpacing(boolean includeEdgeSpacing) {
         this.includeEdgeSpacing = includeEdgeSpacing;
         return this;
     }
 
-    public Builder setPeekHeight(int peekHeight) {
+    public SettingsModel setPeekHeight(int peekHeight) {
         this.peekHeight = peekHeight;
         return this;
     }
 //
-//    public Builder setPeekHeightResId(@DimenRes int dimenResId) {
+//    public SettingsModel setPeekHeightResId(@DimenRes int dimenResId) {
 //        this.peekHeight = context.getResources().getDimensionPixelSize(dimenResId);
 //        return this;
 //    }
 
-    public Builder setCameraTileBackgroundResId(@ColorRes int colorResId) {
+    public SettingsModel setCameraTileBackgroundResId(@ColorRes int colorResId) {
         this.cameraTileBackgroundResId = colorResId;
         return this;
     }
 
-    public Builder setGalleryTileBackgroundResId(@ColorRes int colorResId) {
+    public SettingsModel setGalleryTileBackgroundResId(@ColorRes int colorResId) {
         this.galleryTileBackgroundResId = colorResId;
         return this;
     }
 
-    public Builder setTitle(String title) {
+    public SettingsModel setTitle(String title) {
         this.title = title;
         return this;
     }
 
-//    public Builder setTitle(@StringRes int stringResId) {
+//    public SettingsModel setTitle(@StringRes int stringResId) {
 //        this.title = context.getResources().getString(stringResId);
 //        return this;
 //    }
 
-    public Builder showTitle(boolean showTitle) {
+    public SettingsModel showTitle(boolean showTitle) {
         this.showTitle = showTitle;
         return this;
     }
 
-    public Builder setCompleteButtonText(String completeButtonText) {
+    public SettingsModel setCompleteButtonText(String completeButtonText) {
         this.completeButtonText = completeButtonText;
         return this;
     }
 
-//    public Builder setCompleteButtonText(@StringRes int completeButtonResId) {
+//    public SettingsModel setCompleteButtonText(@StringRes int completeButtonResId) {
 //        this.completeButtonText = context.getResources().getString(completeButtonResId);
 //        return this;
 //    }
 
-    public Builder setEmptySelectionText(String emptySelectionText) {
+    public SettingsModel setEmptySelectionText(String emptySelectionText) {
         this.emptySelectionText = emptySelectionText;
         return this;
     }
 
-//    public Builder setEmptySelectionText(@StringRes int emptySelectionResId) {
+//    public SettingsModel setEmptySelectionText(@StringRes int emptySelectionResId) {
 //        this.emptySelectionText = context.getResources().getString(emptySelectionResId);
 //        return this;
 //    }
 
-//    public Builder setSelectMaxCountErrorText(String selectMaxCountErrorText) {
+//    public SettingsModel setSelectMaxCountErrorText(String selectMaxCountErrorText) {
 //        this.selectMaxCountErrorText = selectMaxCountErrorText;
 //        return this;
 //    }
 //
-//    public Builder setSelectMaxCountErrorText(@StringRes int selectMaxCountErrorResId) {
+//    public SettingsModel setSelectMaxCountErrorText(@StringRes int selectMaxCountErrorResId) {
 //        this.selectMaxCountErrorText = context.getResources().getString(selectMaxCountErrorResId);
 //        return this;
 //    }
 
-    public Builder setSelectMinCountErrorText(String selectMinCountErrorText) {
+    public SettingsModel setSelectMinCountErrorText(String selectMinCountErrorText) {
         this.selectMinCountErrorText = selectMinCountErrorText;
         return this;
     }
 
-//    public Builder setSelectMinCountErrorText(@StringRes int selectMinCountErrorResId) {
+//    public SettingsModel setSelectMinCountErrorText(@StringRes int selectMinCountErrorResId) {
 //        this.selectMinCountErrorText = context.getResources().getString(selectMinCountErrorResId);
 //        return this;
 //    }
 
-    public Builder setTitleBackgroundResId(@ColorRes int colorResId) {
+    public SettingsModel setTitleBackgroundResId(@ColorRes int colorResId) {
         this.titleBackgroundResId = colorResId;
         return this;
     }
 
-    public Builder setImageProvider(TedBottomPicker.ImageProvider imageProvider) {
+    public SettingsModel setImageProvider(TedBottomPicker.ImageProvider imageProvider) {
         this.imageProvider = imageProvider;
         return this;
     }
 
-    public Builder setSelectedUriList(ArrayList<Uri> selectedUriList) {
+    public SettingsModel setSelectedUriList(ArrayList<Uri> selectedUriList) {
         this.selectedUriList = selectedUriList;
         return this;
     }
 
-    public Builder setSelectedUri(Uri selectedUri) {
+    public SettingsModel setSelectedUri(Uri selectedUri) {
         this.selectedUri = selectedUri;
         return this;
     }
 
-    public Builder showVideoMedia() {
+    public SettingsModel showVideoMedia() {
         this.mediaType = MediaType.VIDEO;
         return this;
     }

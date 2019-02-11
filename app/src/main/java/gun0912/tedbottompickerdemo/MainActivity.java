@@ -23,7 +23,7 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 
-import gun0912.tedbottompicker.Builder;
+import gun0912.tedbottompicker.SettingsModel;
 import gun0912.tedbottompicker.TedBottomPicker;
 
 public class MainActivity extends AppCompatActivity implements TedBottomPicker.TedBottomPickerResult {
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                 PermissionListener permissionlistener = new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-                        TedBottomPicker bottomSheetDialogFragment = new Builder()
+                        TedBottomPicker bottomSheetDialogFragment = new SettingsModel()
                                 //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
                                 .setSelectedUri(selectedUri)
                                 //.showVideoMedia()
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                 PermissionListener permissionlistener = new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-                        TedBottomPicker bottomSheetDialogFragment = new Builder()
+                        TedBottomPicker bottomSheetDialogFragment = new SettingsModel()
                                 .setPeekHeight(1600)
                                 .showTitle(false)
                                 .setCompleteButtonText("Done")
@@ -167,8 +167,8 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
 
     @Override
     public void onTedBottomPickerResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Builder.REQUEST_CODE && resultCode == RESULT_OK && data.getExtras() != null) {
-            Uri url = (Uri) data.getExtras().get(Builder.URL_KEY);
+        if (requestCode == SettingsModel.REQUEST_CODE && resultCode == RESULT_OK && data.getExtras() != null) {
+            Uri url = (Uri) data.getExtras().get(SettingsModel.URL_KEY);
             onImageSelected(url);
         }
     }

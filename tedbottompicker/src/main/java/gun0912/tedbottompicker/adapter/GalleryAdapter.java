@@ -22,9 +22,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-import gun0912.tedbottompicker.Builder;
+import gun0912.tedbottompicker.SettingsModel;
 import gun0912.tedbottompicker.R;
-import gun0912.tedbottompicker.TedBottomPicker;
 import gun0912.tedbottompicker.view.TedSquareFrameLayout;
 import gun0912.tedbottompicker.view.TedSquareImageView;
 
@@ -34,11 +33,11 @@ import gun0912.tedbottompicker.view.TedSquareImageView;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
     ArrayList<PickerTile> pickerTiles;
     Context context;
-    Builder builder;
+    SettingsModel builder;
     OnItemClickListener onItemClickListener;
     ArrayList<Uri> selectedUriList;
 
-    public GalleryAdapter(Context context, Builder builder) {
+    public GalleryAdapter(Context context, SettingsModel builder) {
 
         this.context = context;
         this.builder = builder;
@@ -59,7 +58,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             String[] columns;
             String orderBy;
             Uri uri;
-            if (builder.mediaType == Builder.MediaType.IMAGE) {
+            if (builder.mediaType == SettingsModel.MediaType.IMAGE) {
                 uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                 columns = new String[]{MediaStore.Images.Media.DATA};
                 orderBy = MediaStore.Images.Media.DATE_ADDED + " DESC";
@@ -78,7 +77,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                 while (cursor.moveToNext() && count < builder.previewMaxCount) {
 
                     String dataIndex;
-                    if (builder.mediaType == Builder.MediaType.IMAGE) {
+                    if (builder.mediaType == SettingsModel.MediaType.IMAGE) {
                         dataIndex = MediaStore.Images.Media.DATA;
                     }else{
                         dataIndex = MediaStore.Video.VideoColumns.DATA;
@@ -136,10 +135,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
         if (pickerTile.isCameraTile()) {
             holder.iv_thumbnail.setBackgroundResource(builder.cameraTileBackgroundResId);
-            holder.iv_thumbnail.setImageDrawable(builder.cameraTileDrawable);
+            holder.iv_thumbnail.setImageResource(builder.iconCamera);
         } else if (pickerTile.isGalleryTile()) {
             holder.iv_thumbnail.setBackgroundResource(builder.galleryTileBackgroundResId);
-            holder.iv_thumbnail.setImageDrawable(builder.galleryTileDrawable);
+            holder.iv_thumbnail.setImageResource(builder.iconGallery);
 
         } else {
             Uri uri = pickerTile.getImageUri();

@@ -54,7 +54,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     public static final String TAG = "TedBottomPicker";
     static final String EXTRA_CAMERA_IMAGE_URI = "camera_image_uri";
     static final String EXTRA_CAMERA_SELECTED_IMAGE_URI = "camera_selected_image_uri";
-    public static Builder builder;
+    public static SettingsModel builder;
     GalleryAdapter imageGalleryAdapter;
     View view_title_container;
     TextView tv_title;
@@ -96,11 +96,11 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
             cameraImageUri = builder.selectedUri;
             tempUriList = builder.selectedUriList;
 
-            builder = new Builder();
+            builder = new SettingsModel();
         } else {
             cameraImageUri = savedInstanceState.getParcelable(EXTRA_CAMERA_IMAGE_URI);
             tempUriList = savedInstanceState.getParcelableArrayList(EXTRA_CAMERA_SELECTED_IMAGE_URI);
-            builder = savedInstanceState.getParcelable(Builder.BUILDER_KEY);
+            builder = savedInstanceState.getParcelable(SettingsModel.BUILDER_KEY);
         }
     }
 
@@ -109,7 +109,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(EXTRA_CAMERA_IMAGE_URI, cameraImageUri);
         outState.putParcelableArrayList(EXTRA_CAMERA_SELECTED_IMAGE_URI, selectedUriList);
-        outState.putParcelable(Builder.BUILDER_KEY, builder);
+        outState.putParcelable(SettingsModel.BUILDER_KEY, builder);
         super.onSaveInstanceState(outState);
 
     }
@@ -356,7 +356,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
         Intent cameraInent;
         File mediaFile;
 
-        if (builder.mediaType == Builder.MediaType.IMAGE) {
+        if (builder.mediaType == SettingsModel.MediaType.IMAGE) {
             cameraInent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             mediaFile = getImageFile();
         } else {
@@ -448,7 +448,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     private void startGalleryIntent() {
         Intent galleryIntent;
         Uri uri;
-        if (builder.mediaType == Builder.MediaType.IMAGE) {
+        if (builder.mediaType == SettingsModel.MediaType.IMAGE) {
             galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             galleryIntent.setType("image/*");
         } else {
@@ -547,20 +547,20 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
 
     public void onImageSelected(Uri uri) {
         Intent intent = new Intent();
-        intent.putExtra(Builder.URL_KEY, uri);
+        intent.putExtra(SettingsModel.URL_KEY, uri);
         Fragment fragment = getTargetFragment();
         if(fragment != null){
-            fragment.onActivityResult(Builder.REQUEST_CODE, Activity.RESULT_OK, intent);
+            fragment.onActivityResult(SettingsModel.REQUEST_CODE, Activity.RESULT_OK, intent);
         }
         else  {
             if(getActivity() instanceof TedBottomPickerResult){
-               ((TedBottomPickerResult) getActivity()).onTedBottomPickerResult(Builder.REQUEST_CODE, Activity.RESULT_OK, intent);
+               ((TedBottomPickerResult) getActivity()).onTedBottomPickerResult(SettingsModel.REQUEST_CODE, Activity.RESULT_OK, intent);
             }
             else {
                 throw new RuntimeException("Activity not implement onActivityResult");
             }
         }
-        onActivityResult(Builder.REQUEST_CODE, Activity.RESULT_OK, intent);
+        onActivityResult(SettingsModel.REQUEST_CODE, Activity.RESULT_OK, intent);
 
         dismissAllowingStateLoss();
     }
