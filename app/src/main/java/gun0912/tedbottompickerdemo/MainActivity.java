@@ -1,6 +1,7 @@
 package gun0912.tedbottompickerdemo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -22,11 +23,10 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 
+import gun0912.tedbottompicker.Builder;
 import gun0912.tedbottompicker.TedBottomPicker;
 
-public class MainActivity extends AppCompatActivity {
-
-
+public class MainActivity extends AppCompatActivity implements TedBottomPicker.TedBottomPickerResult {
     ImageView iv_image;
     ArrayList<Uri> selectedUriList;
     Uri selectedUri;
@@ -43,56 +43,33 @@ public class MainActivity extends AppCompatActivity {
         requestManager = Glide.with(this);
         setSingleShowButton();
         setMultiShowButton();
+        extractArgument();
+    }
 
-
+    private void extractArgument() {
     }
 
     private void setSingleShowButton() {
-
-
         Button btn_single_show = (Button) findViewById(R.id.btn_single_show);
         btn_single_show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 PermissionListener permissionlistener = new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-
-                        TedBottomPicker bottomSheetDialogFragment = new TedBottomPicker.Builder(MainActivity.this)
-                                .setOnImageSelectedListener(new TedBottomPicker.OnImageSelectedListener() {
-                                    @Override
-                                    public void onImageSelected(final Uri uri) {
-                                        Log.d("ted", "uri: " + uri);
-                                        Log.d("ted", "uri.getPath(): " + uri.getPath());
-                                        selectedUri = uri;
-
-                                        iv_image.setVisibility(View.VISIBLE);
-                                        mSelectedImagesContainer.setVisibility(View.GONE);
-
-                                        requestManager
-                                                .load(uri)
-                                                .into(iv_image);
-                                    }
-                                })
+                        TedBottomPicker bottomSheetDialogFragment = new Builder()
                                 //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
                                 .setSelectedUri(selectedUri)
                                 //.showVideoMedia()
                                 .setPeekHeight(1200)
-                                .create();
-
+                                .create(MainActivity.this);
                         bottomSheetDialogFragment.show(getSupportFragmentManager());
-
-
                     }
 
                     @Override
                     public void onPermissionDenied(ArrayList<String> deniedPermissions) {
                         Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
                     }
-
-
                 };
 
                 TedPermission.with(MainActivity.this)
@@ -103,6 +80,27 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    // TODO change Uri to String
+    public void onImageSelected(final Uri uri) {
+        Log.d("ted", "uri: " + uri);
+        if (uri != null) {
+            Log.d("ted", "uri.getPath(): " + uri.getPath());
+             selectedUri = uri;
+
+            iv_image.setVisibility(View.VISIBLE);
+            mSelectedImagesContainer.setVisibility(View.GONE);
+
+            requestManager
+                    .load(uri)
+                    .into(iv_image);
+        }
+    }
+
+    public void onImagesSelected(ArrayList<Uri> uriList) {
+        selectedUriList = uriList;
+        showUriList(uriList);
     }
 
     private void setMultiShowButton() {
@@ -111,38 +109,24 @@ public class MainActivity extends AppCompatActivity {
         btn_multi_show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 PermissionListener permissionlistener = new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-
-                        TedBottomPicker bottomSheetDialogFragment = new TedBottomPicker.Builder(MainActivity.this)
-                                .setOnMultiImageSelectedListener(new TedBottomPicker.OnMultiImageSelectedListener() {
-                                    @Override
-                                    public void onImagesSelected(ArrayList<Uri> uriList) {
-                                        selectedUriList = uriList;
-                                        showUriList(uriList);
-                                    }
-                                })
-                                //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
+                        TedBottomPicker bottomSheetDialogFragment = new Builder()
                                 .setPeekHeight(1600)
                                 .showTitle(false)
                                 .setCompleteButtonText("Done")
                                 .setEmptySelectionText("No Select")
                                 .setSelectedUriList(selectedUriList)
-                                .create();
+                                .create(MainActivity.this);
 
                         bottomSheetDialogFragment.show(getSupportFragmentManager());
-
-
                     }
 
                     @Override
                     public void onPermissionDenied(ArrayList<String> deniedPermissions) {
                         Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
                     }
-
 
                 };
 
@@ -151,12 +135,9 @@ public class MainActivity extends AppCompatActivity {
                         .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
                         .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .check();
-
             }
         });
-
     }
-
 
     private void showUriList(ArrayList<Uri> uriList) {
         // Remove all views before
@@ -169,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
         int wdpx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
         int htpx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
 
-
         for (Uri uri : uriList) {
 
             View imageHolder = LayoutInflater.from(this).inflate(R.layout.image_item, null);
@@ -181,11 +161,15 @@ public class MainActivity extends AppCompatActivity {
                     .into(thumbnail);
 
             mSelectedImagesContainer.addView(imageHolder);
-
             thumbnail.setLayoutParams(new FrameLayout.LayoutParams(wdpx, htpx));
-
-
         }
+    }
 
+    @Override
+    public void onTedBottomPickerResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Builder.REQUEST_CODE && resultCode == RESULT_OK && data.getExtras() != null) {
+            Uri url = (Uri) data.getExtras().get(Builder.URL_KEY);
+            onImageSelected(url);
+        }
     }
 }
