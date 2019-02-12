@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorRes;
@@ -47,7 +48,7 @@ public class SettingsModel implements Parcelable {
     public int galleryTileBackgroundResId = R.color.tedbottompicker_gallery;
 
     public String title;
-    public boolean showTitle = true;
+//    public boolean showTitle = true;
     public int titleBackgroundResId;
 
     public int selectMaxCount = Integer.MAX_VALUE;
@@ -131,7 +132,6 @@ public class SettingsModel implements Parcelable {
         cameraTileBackgroundResId = in.readInt();
         galleryTileBackgroundResId = in.readInt();
         title = in.readString();
-        showTitle = in.readByte() != 0;
         titleBackgroundResId = in.readInt();
         selectMaxCount = in.readInt();
         selectMinCount = in.readInt();
@@ -155,7 +155,6 @@ public class SettingsModel implements Parcelable {
         dest.writeInt(cameraTileBackgroundResId);
         dest.writeInt(galleryTileBackgroundResId);
         dest.writeString(title);
-        dest.writeByte((byte) (showTitle ? 1 : 0));
         dest.writeInt(titleBackgroundResId);
         dest.writeInt(selectMaxCount);
         dest.writeInt(selectMinCount);
@@ -265,11 +264,6 @@ public class SettingsModel implements Parcelable {
 //        return this;
 //    }
 
-    public SettingsModel showTitle(boolean showTitle) {
-        this.showTitle = showTitle;
-        return this;
-    }
-
     public SettingsModel setCompleteButtonText(String completeButtonText) {
         this.completeButtonText = completeButtonText;
         return this;
@@ -341,13 +335,10 @@ public class SettingsModel implements Parcelable {
             throw new RuntimeException("Missing required WRITE_EXTERNAL_STORAGE permission. Did you remember to request it first?");
         }
 
-//        if (onImageSelectedListener == null && onMultiImageSelectedListener == null) {
-//            throw new RuntimeException("You have to use setOnImageSelectedListener() or setOnMultiImageSelectedListener() for receive selected Uri");
-//        }
-
         TedBottomPicker customBottomSheetDialogFragment = new TedBottomPicker();
-
-        customBottomSheetDialogFragment.builder = this;
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(SettingsModel.BUILDER_KEY, this);
+        customBottomSheetDialogFragment.setArguments(bundle);
         return customBottomSheetDialogFragment;
     }
 

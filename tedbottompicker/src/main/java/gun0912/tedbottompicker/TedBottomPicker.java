@@ -56,10 +56,8 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     static final String EXTRA_CAMERA_SELECTED_IMAGE_URI = "camera_selected_image_uri";
     public static SettingsModel builder;
     GalleryAdapter imageGalleryAdapter;
-    View view_title_container;
     TextView tv_title;
     Button btn_done;
-
     FrameLayout selected_photos_container_frame;
     HorizontalScrollView hsv_selected_photos;
     LinearLayout selected_photos_container;
@@ -88,6 +86,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        extractArgument();
         setupSavedInstanceState(savedInstanceState);
     }
 
@@ -95,15 +94,20 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
         if (savedInstanceState == null) {
             cameraImageUri = builder.selectedUri;
             tempUriList = builder.selectedUriList;
-
-            builder = new SettingsModel();
         } else {
             cameraImageUri = savedInstanceState.getParcelable(EXTRA_CAMERA_IMAGE_URI);
             tempUriList = savedInstanceState.getParcelableArrayList(EXTRA_CAMERA_SELECTED_IMAGE_URI);
-            builder = savedInstanceState.getParcelable(SettingsModel.BUILDER_KEY);
         }
     }
 
+    void extractArgument(){
+        if(getArguments() != null && getArguments().containsKey(SettingsModel.BUILDER_KEY)) {
+            builder = getArguments().getParcelable(SettingsModel.BUILDER_KEY);
+        }
+        else {
+            builder = new SettingsModel();
+        }
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -111,7 +115,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
         outState.putParcelableArrayList(EXTRA_CAMERA_SELECTED_IMAGE_URI, selectedUriList);
         outState.putParcelable(SettingsModel.BUILDER_KEY, builder);
         super.onSaveInstanceState(outState);
-
     }
 
     public void show(FragmentManager fragmentManager) {
@@ -148,7 +151,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
 
         initView(contentView);
 
-        setTitle();
         setRecyclerView();
         setSelectionView();
 
@@ -163,9 +165,20 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
 ////            }
 ////        }
         addUri(cameraImageUri);
-
+        setTitle();
         setDoneButton();
-        checkMultiMode();
+    }
+
+    private void setTitle(){
+        if(!TextUtils.isEmpty(builder.title)){
+            tv_title.setText(builder.title);
+            if (builder.titleBackgroundResId > 0) {
+                tv_title.setBackgroundResource(builder.titleBackgroundResId);
+            }
+        }
+        else {
+            tv_title.setVisibility(View.GONE);
+        }
     }
 
     private void setSelectionView() {
@@ -175,16 +188,23 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     }
 
     private void setDoneButton() {
-        if (builder.completeButtonText != null) {
-            btn_done.setText(builder.completeButtonText);
-        }
-
-        btn_done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onMultiSelectComplete();
+        if(isMultiSelect()) {
+            selected_photos_container_frame.setVisibility(View.VISIBLE);
+            if (builder.completeButtonText != null) {
+                btn_done.setText(builder.completeButtonText);
             }
-        });
+
+            btn_done.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onMultiSelectComplete();
+                }
+            });
+        }
+        else {
+            btn_done.setVisibility(View.GONE);
+            selected_photos_container_frame.setVisibility(View.GONE);
+        }
     }
 
     private void onMultiSelectComplete() {
@@ -205,16 +225,8 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
         dismissAllowingStateLoss();
     }
 
-    private void checkMultiMode() {
-        if (!isMultiSelect()) {
-            btn_done.setVisibility(View.GONE);
-            selected_photos_container_frame.setVisibility(View.GONE);
-        }
-    }
-
     private void initView(View contentView) {
 
-        view_title_container = contentView.findViewById(R.id.view_title_container);
         rc_gallery = (RecyclerView) contentView.findViewById(R.id.rc_gallery);
         tv_title = (TextView) contentView.findViewById(R.id.tv_title);
         btn_done = (Button) contentView.findViewById(R.id.btn_done);
@@ -477,27 +489,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
 
     private void errorMessage() {
         onError("Error");
-    }
-
-    private void setTitle() {
-
-        if (!builder.showTitle) {
-            tv_title.setVisibility(View.GONE);
-
-            if (!isMultiSelect()) {
-                view_title_container.setVisibility(View.GONE);
-            }
-            return;
-        }
-
-        if (!TextUtils.isEmpty(builder.title)) {
-            tv_title.setText(builder.title);
-        }
-
-        if (builder.titleBackgroundResId > 0) {
-            tv_title.setBackgroundResource(builder.titleBackgroundResId);
-        }
-
     }
 
     private boolean isMultiSelect() {

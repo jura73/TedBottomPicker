@@ -61,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                                 //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
                                 .setSelectedUri(selectedUri)
                                 //.showVideoMedia()
-                                .setPeekHeight(1200)
+                                //.setTitle("Title")
+                                .setPeekHeight(800)
                                 .create(MainActivity.this);
                         bottomSheetDialogFragment.show(getSupportFragmentManager());
                     }
@@ -114,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                     public void onPermissionGranted() {
                         TedBottomPicker bottomSheetDialogFragment = new SettingsModel()
                                 .setPeekHeight(1600)
-                                .showTitle(false)
                                 .setCompleteButtonText("Done")
                                 .setEmptySelectionText("No Select")
                                 .setSelectedUriList(selectedUriList)
