@@ -13,6 +13,7 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
 import java.lang.annotation.Retention;
@@ -22,7 +23,8 @@ import java.util.ArrayList;
 public class SettingsModel implements Parcelable {
 
     public static final String BUILDER_KEY = "BUILDER_KEY";
-    public static final String URL_KEY = "URL_KEY";
+    public static final String URI_KEY = "URI_KEY";
+    public static final String URI_LIST_KEY = "URI_LIST_KEY";
     public static final int REQUEST_CODE = 112233;
 
     //    public Context context;
@@ -60,8 +62,10 @@ public class SettingsModel implements Parcelable {
     public String selectMinCountErrorText;
     public @MediaType
     int mediaType = MediaType.IMAGE;
-    ArrayList<Uri> selectedUriList;
+    ArrayList<Uri> selectedUriList = new ArrayList<>();
     Uri selectedUri;
+
+    public boolean isMultiSelect = false;
 
     public SettingsModel() {
         iconCamera = R.drawable.ic_camera;
@@ -183,6 +187,11 @@ public class SettingsModel implements Parcelable {
             return new SettingsModel[size];
         }
     };
+
+    public SettingsModel setMultiSelect() {
+        this.isMultiSelect = true;
+        return this;
+    }
 
     public SettingsModel setPreviewMaxCount(int previewMaxCount) {
         this.previewMaxCount = previewMaxCount;
@@ -314,8 +323,10 @@ public class SettingsModel implements Parcelable {
         return this;
     }
 
-    public SettingsModel setSelectedUriList(ArrayList<Uri> selectedUriList) {
-        this.selectedUriList = selectedUriList;
+    public SettingsModel setSelectedUriList(@Nullable ArrayList<Uri> selectedUriList) {
+        if(selectedUriList != null) {
+            this.selectedUriList.addAll(selectedUriList);
+        }
         return this;
     }
 

@@ -65,7 +65,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     TextView selected_photos_empty;
     View contentView;
     ArrayList<Uri> selectedUriList;
-    ArrayList<Uri> tempUriList;
     private Uri cameraImageUri;
     private RecyclerView rc_gallery;
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
@@ -93,10 +92,10 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     private void setupSavedInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             cameraImageUri = builder.selectedUri;
-            tempUriList = builder.selectedUriList;
+            selectedUriList = builder.selectedUriList;
         } else {
             cameraImageUri = savedInstanceState.getParcelable(EXTRA_CAMERA_IMAGE_URI);
-            tempUriList = savedInstanceState.getParcelableArrayList(EXTRA_CAMERA_SELECTED_IMAGE_URI);
+            selectedUriList = savedInstanceState.getParcelableArrayList(EXTRA_CAMERA_SELECTED_IMAGE_URI);
         }
     }
 
@@ -154,19 +153,14 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
         setRecyclerView();
         setSelectionView();
 
-        selectedUriList = new ArrayList<>();
-
-// TODO ????
-//        if (builder.onImageSelectedListener != null && cameraImageUri != null) {
-////            addUri(cameraImageUri);
-////        } else if (builder.onMultiImageSelectedListener != null && tempUriList != null) {
-////            for (Uri uri : tempUriList) {
-////                addUri(uri);
-////            }
-////        }
-        addUri(cameraImageUri);
         setTitle();
         setDoneButton();
+
+        if(builder.isMultiSelect){
+            for (Uri uri : selectedUriList){
+                addUrlToGallery(uri);
+            }
+        }
     }
 
     private void setTitle(){
@@ -188,7 +182,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     }
 
     private void setDoneButton() {
-        if(isMultiSelect()) {
+        if(builder.isMultiSelect) {
             selected_photos_container_frame.setVisibility(View.VISIBLE);
             if (builder.completeButtonText != null) {
                 btn_done.setText(builder.completeButtonText);
@@ -277,7 +271,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     private void complete(final Uri uri) {
         Log.d(TAG, "selected uri: " + uri.toString());
         //uri = Uri.parse(uri.toString());
-        if (isMultiSelect()) {
+        if (builder.isMultiSelect) {
             if (selectedUriList.contains(uri)) {
                 removeImage(uri);
             } else {
@@ -289,7 +283,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
     }
 
     private boolean addUri(final Uri uri) {
-
         if (selectedUriList.size() == builder.selectMaxCount) {
             String message;
             if (builder.selectMaxCountErrorText != null) {
@@ -303,13 +296,17 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
         }
 
         selectedUriList.add(uri);
+        addUrlToGallery(uri);
+        return true;
+    }
 
+    private void addUrlToGallery(final Uri uri){
         final View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.tedbottompicker_selected_item, null);
         ImageView thumbnail = (ImageView) rootView.findViewById(R.id.selected_photo);
         ImageView iv_close = (ImageView) rootView.findViewById(R.id.iv_close);
         rootView.setTag(uri);
 
-        selected_photos_container.addView(rootView, 0);
+        selected_photos_container.addView(rootView);
 
         int px = (int) getResources().getDimension(R.dimen.tedbottompicker_selected_image_height);
         thumbnail.setLayoutParams(new FrameLayout.LayoutParams(px, px));
@@ -334,9 +331,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
 
             }
         });
-        updateSelectedView();
-        imageGalleryAdapter.setSelectedUriList(selectedUriList, uri);
-        return true;
+        updateGallery(uri);
     }
 
     private void removeImage(Uri uri) {
@@ -348,13 +343,15 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
                 break;
             }
         }
+        updateGallery(uri);
+    }
 
+    private void updateGallery(Uri uri){
         updateSelectedView();
         imageGalleryAdapter.setSelectedUriList(selectedUriList, uri);
     }
 
     private void updateSelectedView() {
-
         if (selectedUriList == null || selectedUriList.size() == 0) {
             selected_photos_empty.setVisibility(View.VISIBLE);
             selected_photos_container.setVisibility(View.GONE);
@@ -491,11 +488,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
         onError("Error");
     }
 
-    private boolean isMultiSelect() {
-        return false; // TODO ????
-       // return onMultiImageSelectedListener != null;
-    }
-
     private void onActivityResultCamera(final Uri cameraImageUri) {
 
         MediaScannerConnection.scanFile(getContext(), new String[]{cameraImageUri.getPath()}, new String[]{"image/jpeg"}, new MediaScannerConnection.MediaScannerConnectionClient() {
@@ -538,26 +530,31 @@ public class TedBottomPicker extends BottomSheetDialogFragment{
 
     public void onImageSelected(Uri uri) {
         Intent intent = new Intent();
-        intent.putExtra(SettingsModel.URL_KEY, uri);
+        intent.putExtra(SettingsModel.URI_KEY, uri);
+        returnResultIntent(intent);
+    }
+
+    public void onImagesSelected(ArrayList<Uri> uriList) {
+        Intent intent = new Intent();
+        intent.putExtra(SettingsModel.URI_LIST_KEY, uriList);
+        returnResultIntent(intent);
+    }
+
+    private void returnResultIntent(Intent intent){
         Fragment fragment = getTargetFragment();
         if(fragment != null){
             fragment.onActivityResult(SettingsModel.REQUEST_CODE, Activity.RESULT_OK, intent);
         }
         else  {
             if(getActivity() instanceof TedBottomPickerResult){
-               ((TedBottomPickerResult) getActivity()).onTedBottomPickerResult(SettingsModel.REQUEST_CODE, Activity.RESULT_OK, intent);
+                ((TedBottomPickerResult) getActivity()).onTedBottomPickerResult(SettingsModel.REQUEST_CODE, Activity.RESULT_OK, intent);
             }
             else {
                 throw new RuntimeException("Activity not implement onActivityResult");
             }
         }
         onActivityResult(SettingsModel.REQUEST_CODE, Activity.RESULT_OK, intent);
-
         dismissAllowingStateLoss();
-    }
-
-    public void onImagesSelected(ArrayList<Uri> uriList) {
-
     }
 
     public void onError(String message) {

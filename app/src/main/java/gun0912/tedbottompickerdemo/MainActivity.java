@@ -43,10 +43,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
         requestManager = Glide.with(this);
         setSingleShowButton();
         setMultiShowButton();
-        extractArgument();
-    }
-
-    private void extractArgument() {
     }
 
     private void setSingleShowButton() {
@@ -83,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
         });
     }
 
-    // TODO change Uri to String
     public void onImageSelected(final Uri uri) {
         Log.d("ted", "uri: " + uri);
         if (uri != null) {
@@ -117,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                                 .setPeekHeight(1600)
                                 .setCompleteButtonText("Done")
                                 .setEmptySelectionText("No Select")
+                                .setMultiSelect()
                                 .setSelectedUriList(selectedUriList)
                                 .create(MainActivity.this);
 
@@ -167,9 +163,16 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
 
     @Override
     public void onTedBottomPickerResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SettingsModel.REQUEST_CODE && resultCode == RESULT_OK && data.getExtras() != null) {
-            Uri url = (Uri) data.getExtras().get(SettingsModel.URL_KEY);
-            onImageSelected(url);
+        if (requestCode == SettingsModel.REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getExtras() != null) {
+            Bundle bundle = data.getExtras();
+            if(bundle.containsKey(SettingsModel.URI_KEY)){
+                Uri url = (Uri)bundle.get(SettingsModel.URI_KEY);
+                onImageSelected(url);
+            }
+            if(bundle.containsKey(SettingsModel.URI_LIST_KEY)){
+                ArrayList<Uri> uriList = (ArrayList<Uri>) bundle.get(SettingsModel.URI_LIST_KEY);
+                onImagesSelected(uriList);
+            }
         }
     }
 }
