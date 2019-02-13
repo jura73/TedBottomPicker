@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                     public void onPermissionGranted() {
                         TedBottomPicker bottomSheetDialogFragment = new SettingsModel()
                                 .setPeekHeight(1600)
-                                .setCompleteButtonText("Done")
+                                .setCompleteButtonText(R.string.btn_done)
                                 .setEmptySelectionText("No Select")
                                 .setMultiSelect()
                                 .setSelectedUriList(selectedUriList)

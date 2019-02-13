@@ -33,23 +33,23 @@ import gun0912.tedbottompicker.view.TedSquareImageView;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
     ArrayList<PickerTile> pickerTiles;
     Context context;
-    SettingsModel builder;
+    SettingsModel settingsModel;
     OnItemClickListener onItemClickListener;
     ArrayList<Uri> selectedUriList;
 
-    public GalleryAdapter(Context context, SettingsModel builder) {
+    public GalleryAdapter(Context context, SettingsModel settingsModel) {
 
         this.context = context;
-        this.builder = builder;
+        this.settingsModel = settingsModel;
 
         pickerTiles = new ArrayList<>();
         selectedUriList = new ArrayList<>();
 
-        if (builder.showCamera) {
+        if (settingsModel.showCamera) {
             pickerTiles.add(new PickerTile(PickerTile.CAMERA));
         }
 
-        if (builder.showGallery) {
+        if (settingsModel.showGallery) {
             pickerTiles.add(new PickerTile(PickerTile.GALLERY));
         }
 
@@ -58,7 +58,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             String[] columns;
             String orderBy;
             Uri uri;
-            if (builder.mediaType == SettingsModel.MediaType.IMAGE) {
+            if (settingsModel.mediaType == SettingsModel.MediaType.IMAGE) {
                 uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                 columns = new String[]{MediaStore.Images.Media.DATA};
                 orderBy = MediaStore.Images.Media.DATE_ADDED + " DESC";
@@ -74,10 +74,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             if (cursor != null) {
 
                 int count = 0;
-                while (cursor.moveToNext() && count < builder.previewMaxCount) {
+                while (cursor.moveToNext() && count < settingsModel.previewMaxCount) {
 
                     String dataIndex;
-                    if (builder.mediaType == SettingsModel.MediaType.IMAGE) {
+                    if (settingsModel.mediaType == SettingsModel.MediaType.IMAGE) {
                         dataIndex = MediaStore.Images.Media.DATA;
                     }else{
                         dataIndex = MediaStore.Video.VideoColumns.DATA;
@@ -134,15 +134,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         boolean isSelected = false;
 
         if (pickerTile.isCameraTile()) {
-            holder.iv_thumbnail.setBackgroundResource(builder.cameraTileBackgroundResId);
-            holder.iv_thumbnail.setImageResource(builder.iconCamera);
+            holder.iv_thumbnail.setBackgroundResource(settingsModel.cameraTileBackgroundResId);
+            holder.iv_thumbnail.setImageResource(settingsModel.iconCamera);
         } else if (pickerTile.isGalleryTile()) {
-            holder.iv_thumbnail.setBackgroundResource(builder.galleryTileBackgroundResId);
-            holder.iv_thumbnail.setImageResource(builder.iconGallery);
+            holder.iv_thumbnail.setBackgroundResource(settingsModel.galleryTileBackgroundResId);
+            holder.iv_thumbnail.setImageResource(settingsModel.iconGallery);
 
         } else {
             Uri uri = pickerTile.getImageUri();
-            if (builder.imageProvider == null) {
+            if (settingsModel.imageProvider == null) {
                 Glide.with(context)
                         .load(uri)
                         .thumbnail(0.1f)
@@ -151,7 +151,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                                 .error(R.drawable.img_error))
                         .into(holder.iv_thumbnail);
             } else {
-                builder.imageProvider.onProvideImage(holder.iv_thumbnail, uri);
+                settingsModel.imageProvider.onProvideImage(holder.iv_thumbnail, uri);
             }
             isSelected = selectedUriList.contains(uri);
         }
@@ -159,8 +159,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         if (holder.root instanceof FrameLayout) {
             Drawable foregroundDrawable;
 
-            if (builder.selectedForegroundDrawable != null) {
-                foregroundDrawable = builder.selectedForegroundDrawable;
+            if (settingsModel.selectedForegroundDrawable != null) {
+                foregroundDrawable = settingsModel.selectedForegroundDrawable;
             } else {
                 foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.gallery_photo_selected);
             }

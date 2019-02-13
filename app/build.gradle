@@ -1,9 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-
     compileSdkVersion 27
-
 
     defaultConfig {
         applicationId "gun0912.tedbottompickerdemo"
@@ -26,8 +24,6 @@ android {
 
 
 repositories {
-
-
 }
 
 dependencies {

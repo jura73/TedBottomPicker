@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TedBottomPickerDemo</string>
+    <string name="btn_done">Done</string>
 </resources>
