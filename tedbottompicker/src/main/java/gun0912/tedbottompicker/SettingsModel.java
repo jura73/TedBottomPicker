@@ -1,6 +1,7 @@
 package gun0912.tedbottompicker;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -15,6 +16,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import java.lang.annotation.Retention;
@@ -24,10 +26,6 @@ import java.util.ArrayList;
 public class SettingsModel implements Parcelable {
 
     static final String BUILDER_KEY = "BUILDER_KEY";
-    public static final String URI_KEY = "URI_KEY";
-    public static final String URI_LIST_KEY = "URI_LIST_KEY";
-    public static final int REQUEST_CODE = 112233;
-
     public int previewMaxCount = 25;
     @DrawableRes
     public int iconCamera;
@@ -258,17 +256,29 @@ public class SettingsModel implements Parcelable {
         return this;
     }
 
-    public TedBottomPicker create(@NonNull Context context) {
+    public TedBottomPicker create(@NonNull Activity activity) {
+        checkPermission(activity);
+        checkImplementation(activity);
+        return TedBottomPicker.newInstance(this);
+    }
+
+    public TedBottomPicker create(@NonNull Fragment fragment) {
+        checkPermission(fragment.getContext());
+        checkImplementation(fragment);
+        return TedBottomPicker.newInstance(this);
+    }
+
+    private void checkPermission(@NonNull Context context){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             throw new RuntimeException("Missing required WRITE_EXTERNAL_STORAGE permission. Did you remember to request it first?");
         }
+    }
 
-        TedBottomPicker customBottomSheetDialogFragment = new TedBottomPicker();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(SettingsModel.BUILDER_KEY, this);
-        customBottomSheetDialogFragment.setArguments(bundle);
-        return customBottomSheetDialogFragment;
+    private void checkImplementation(@NonNull Object fragment){
+        if (!(fragment instanceof TedBottomPicker.OnImageSelectedListener || fragment instanceof TedBottomPicker.OnMultiImageSelectedListener) ) {
+            throw new RuntimeException("You have to use setOnImageSelectedListener() or setOnMultiImageSelectedListener() for receive selected Uri");
+        }
     }
 
     @Retention(RetentionPolicy.SOURCE)

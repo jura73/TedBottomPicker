@@ -1,7 +1,6 @@
 package gun0912.tedbottompickerdemo;
 
 import android.Manifest;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -23,10 +22,9 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 
-import gun0912.tedbottompicker.SettingsModel;
 import gun0912.tedbottompicker.TedBottomPicker;
 
-public class MainActivity extends AppCompatActivity implements TedBottomPicker.TedBottomPickerResult {
+public class MainActivity extends AppCompatActivity implements TedBottomPicker.OnImageSelectedListener, TedBottomPicker.OnMultiImageSelectedListener {
     ImageView iv_image;
     ArrayList<Uri> selectedUriList;
     Uri selectedUri;
@@ -53,13 +51,13 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                 PermissionListener permissionlistener = new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-                        TedBottomPicker bottomSheetDialogFragment = new SettingsModel()
+                        TedBottomPicker bottomSheetDialogFragment = TedBottomPicker.Builder()
                                 //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
                                 .setSelectedUri(selectedUri)
                                 //.showVideoMedia()
-                                //.setTitle("Title")
-                                .setPeekHeight(800)
+                                .setPeekHeight(1200)
                                 .create(MainActivity.this);
+
                         bottomSheetDialogFragment.show(getSupportFragmentManager());
                     }
 
@@ -77,26 +75,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
 
             }
         });
-    }
-
-    public void onImageSelected(final Uri uri) {
-        Log.d("ted", "uri: " + uri);
-        if (uri != null) {
-            Log.d("ted", "uri.getPath(): " + uri.getPath());
-             selectedUri = uri;
-
-            iv_image.setVisibility(View.VISIBLE);
-            mSelectedImagesContainer.setVisibility(View.GONE);
-
-            requestManager
-                    .load(uri)
-                    .into(iv_image);
-        }
-    }
-
-    public void onImagesSelected(ArrayList<Uri> uriList) {
-        selectedUriList = uriList;
-        showUriList(uriList);
     }
 
     private void setMultiShowButton() {
@@ -108,12 +86,13 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                 PermissionListener permissionlistener = new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-                        TedBottomPicker bottomSheetDialogFragment = new SettingsModel()
-                                .setPeekHeight(1600)
+                        TedBottomPicker bottomSheetDialogFragment = TedBottomPicker.Builder()
+                                .setPeekHeight(getResources().getDisplayMetrics().heightPixels / 2)
+//                                .setPeekHeight(1600)
                                 .setCompleteButtonText(R.string.btn_done)
                                 .setEmptySelectionText("No Select")
-                                .setMultiSelect()
                                 .setSelectedUriList(selectedUriList)
+                                .setMultiSelect()
                                 .create(MainActivity.this);
 
                         bottomSheetDialogFragment.show(getSupportFragmentManager());
@@ -123,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
                     public void onPermissionDenied(ArrayList<String> deniedPermissions) {
                         Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
                     }
-
                 };
 
                 TedPermission.with(MainActivity.this)
@@ -135,9 +113,25 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
         });
     }
 
-    private void showUriList(ArrayList<Uri> uriList) {
+    public void onImageSelected(final Uri uri) {
+        Log.d("ted", "uri: " + uri);
+        if (uri != null) {
+            Log.d("ted", "uri.getPath(): " + uri.getPath());
+            selectedUri = uri;
+
+            iv_image.setVisibility(View.VISIBLE);
+            mSelectedImagesContainer.setVisibility(View.GONE);
+
+            requestManager
+                    .load(uri)
+                    .into(iv_image);
+        }
+    }
+
+    public void onImagesSelected(ArrayList<Uri> uriList) {
         // Remove all views before
         // adding the new ones.
+        selectedUriList = uriList;
         mSelectedImagesContainer.removeAllViews();
 
         iv_image.setVisibility(View.GONE);
@@ -158,21 +152,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.T
 
             mSelectedImagesContainer.addView(imageHolder);
             thumbnail.setLayoutParams(new FrameLayout.LayoutParams(wdpx, htpx));
-        }
-    }
-
-    @Override
-    public void onTedBottomPickerResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SettingsModel.REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getExtras() != null) {
-            Bundle bundle = data.getExtras();
-            if(bundle.containsKey(SettingsModel.URI_KEY)){
-                Uri url = (Uri)bundle.get(SettingsModel.URI_KEY);
-                onImageSelected(url);
-            }
-            if(bundle.containsKey(SettingsModel.URI_LIST_KEY)){
-                ArrayList<Uri> uriList = (ArrayList<Uri>) bundle.get(SettingsModel.URI_LIST_KEY);
-                onImagesSelected(uriList);
-            }
         }
     }
 }
