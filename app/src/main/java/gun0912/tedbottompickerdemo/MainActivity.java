@@ -92,8 +92,7 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
                                 .setCompleteButtonText(R.string.btn_done)
                                 .setEmptySelectionText("No Select")
                                 .setSelectedUriList(selectedUriList)
-                                .setMultiSelect()
-                                .create(MainActivity.this);
+                                .createMultiSelect(MainActivity.this);
 
                         bottomSheetDialogFragment.show(getSupportFragmentManager());
                     }
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
         });
     }
 
-    public void onImageSelected(final Uri uri) {
+    public void onImageSelected(final Uri uri, String tag) {
         Log.d("ted", "uri: " + uri);
         if (uri != null) {
             Log.d("ted", "uri.getPath(): " + uri.getPath());
@@ -128,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
         }
     }
 
-    public void onImagesSelected(ArrayList<Uri> uriList) {
+    public void onImagesSelected(ArrayList<Uri> uriList, String tag) {
         // Remove all views before
         // adding the new ones.
         selectedUriList = uriList;

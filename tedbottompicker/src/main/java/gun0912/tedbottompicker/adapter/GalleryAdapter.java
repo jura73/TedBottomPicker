@@ -22,8 +22,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-import gun0912.tedbottompicker.SettingsModel;
 import gun0912.tedbottompicker.R;
+import gun0912.tedbottompicker.SettingsModel;
 import gun0912.tedbottompicker.view.TedSquareFrameLayout;
 import gun0912.tedbottompicker.view.TedSquareImageView;
 
@@ -79,7 +79,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                     String dataIndex;
                     if (settingsModel.mediaType == SettingsModel.MediaType.IMAGE) {
                         dataIndex = MediaStore.Images.Media.DATA;
-                    }else{
+                    } else {
                         dataIndex = MediaStore.Video.VideoColumns.DATA;
                     }
                     String imageLocation = cursor.getString(cursor.getColumnIndex(dataIndex));
@@ -159,11 +159,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         if (holder.root instanceof FrameLayout) {
             Drawable foregroundDrawable;
 
-            if (settingsModel.selectedForegroundDrawable != null) {
-                foregroundDrawable = settingsModel.selectedForegroundDrawable;
-            } else {
-                foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.gallery_photo_selected);
-            }
+            foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.gallery_photo_selected);
+
             ((FrameLayout) holder.root).setForeground(isSelected ? foregroundDrawable : null);
         }
 
@@ -201,9 +198,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         public static final int CAMERA = 2;
         public static final int GALLERY = 3;
         protected final Uri imageUri;
-        protected final
         @TileType
-        int tileType;
+        protected final int tileType;
 
         PickerTile(@SpecialTileType int tileType) {
             this(null, tileType);

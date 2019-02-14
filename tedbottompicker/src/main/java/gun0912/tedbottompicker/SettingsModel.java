@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorRes;
@@ -26,14 +25,14 @@ import java.util.ArrayList;
 public class SettingsModel implements Parcelable {
 
     static final String BUILDER_KEY = "BUILDER_KEY";
+    static  final int REQUEST_CODE = 912;
     public int previewMaxCount = 25;
     @DrawableRes
     public int iconCamera;
     @DrawableRes
     public int iconGallery;
 
-    public Drawable deSelectIconDrawable;
-    public Drawable selectedForegroundDrawable;
+    public String tag;
 
     int spacing = 1;
     boolean includeEdgeSpacing = false;
@@ -59,17 +58,13 @@ public class SettingsModel implements Parcelable {
     ArrayList<Uri> selectedUriList = new ArrayList<>();
     Uri selectedUri;
 
-    boolean isMultiSelect = false;
-
-    public SettingsModel() {
-        iconCamera = R.drawable.ic_camera;
-        iconGallery = R.drawable.ic_gallery;
-    }
+    private boolean isMultiSelect = false;
 
     protected SettingsModel(Parcel in) {
         previewMaxCount = in.readInt();
         iconCamera = in.readInt();
         iconGallery = in.readInt();
+        tag = in.readString();
         spacing = in.readInt();
         includeEdgeSpacing = in.readByte() != 0;
         showCamera = in.readByte() != 0;
@@ -96,6 +91,7 @@ public class SettingsModel implements Parcelable {
         dest.writeInt(previewMaxCount);
         dest.writeInt(iconCamera);
         dest.writeInt(iconGallery);
+        dest.writeString(tag);
         dest.writeInt(spacing);
         dest.writeByte((byte) (includeEdgeSpacing ? 1 : 0));
         dest.writeByte((byte) (showCamera ? 1 : 0));
@@ -134,9 +130,13 @@ public class SettingsModel implements Parcelable {
         }
     };
 
-    public SettingsModel setMultiSelect() {
-        this.isMultiSelect = true;
-        return this;
+    boolean isMultiSelect() {
+        return isMultiSelect;
+    }
+
+    SettingsModel() {
+        iconCamera = R.drawable.ic_camera;
+        iconGallery = R.drawable.ic_gallery;
     }
 
     public SettingsModel setPreviewMaxCount(int previewMaxCount) {
@@ -258,27 +258,61 @@ public class SettingsModel implements Parcelable {
 
     public TedBottomPicker create(@NonNull Activity activity) {
         checkPermission(activity);
-        checkImplementation(activity);
+        checkImplementationOnImageSelected(activity);
+        return TedBottomPicker.newInstance(this);
+    }
+
+    public TedBottomPicker createMultiSelect(@NonNull Activity activity) {
+        checkPermission(activity);
+        setMultiSelect(activity);
         return TedBottomPicker.newInstance(this);
     }
 
     public TedBottomPicker create(@NonNull Fragment fragment) {
         checkPermission(fragment.getContext());
-        checkImplementation(fragment);
-        return TedBottomPicker.newInstance(this);
+        checkImplementationOnImageSelected(fragment);
+
+        TedBottomPicker tedBottomPicker = TedBottomPicker.newInstance(this);
+        tedBottomPicker.setTargetFragment(fragment, REQUEST_CODE);
+        return tedBottomPicker;
     }
 
-    private void checkPermission(@NonNull Context context){
+    public TedBottomPicker createMultiSelect(@NonNull Fragment fragment) {
+        checkPermission(fragment.getContext());
+        setMultiSelect(fragment);
+
+        TedBottomPicker tedBottomPicker = TedBottomPicker.newInstance(this);
+        tedBottomPicker.setTargetFragment(fragment, REQUEST_CODE);
+        return tedBottomPicker;
+    }
+
+    private void setMultiSelect(@NonNull Object object) {
+        checkImplementationMultiImageSelected(object);
+        isMultiSelect = true;
+    }
+
+    private void checkPermission(@NonNull Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             throw new RuntimeException("Missing required WRITE_EXTERNAL_STORAGE permission. Did you remember to request it first?");
         }
     }
 
-    private void checkImplementation(@NonNull Object fragment){
-        if (!(fragment instanceof TedBottomPicker.OnImageSelectedListener || fragment instanceof TedBottomPicker.OnMultiImageSelectedListener) ) {
-            throw new RuntimeException("You have to use setOnImageSelectedListener() or setOnMultiImageSelectedListener() for receive selected Uri");
+    private void checkImplementationOnImageSelected(@NonNull Object object) {
+        if (!(object instanceof TedBottomPicker.OnImageSelectedListener)) {
+            throw new RuntimeException("You have implementation OnImageSelectedListener for receive selected Uri");
         }
+    }
+
+    private void checkImplementationMultiImageSelected(@NonNull Object object) {
+        if (!(object instanceof TedBottomPicker.OnMultiImageSelectedListener)) {
+            throw new RuntimeException("You have implementation OnMultiImageSelectedListener for receive selected Uri");
+        }
+    }
+
+    public SettingsModel setTag(String tag) {
+        this.tag = tag;
+        return  this;
     }
 
     @Retention(RetentionPolicy.SOURCE)

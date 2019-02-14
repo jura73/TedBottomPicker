@@ -167,7 +167,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         setTitle();
         setDoneButton();
 
-        if (settingsModel.isMultiSelect) {
+        if (settingsModel.isMultiSelect()) {
             for (Uri uri : selectedUriList) {
                 addUrlToGallery(uri);
             }
@@ -192,7 +192,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     }
 
     private void setDoneButton() {
-        if (settingsModel.isMultiSelect) {
+        if (settingsModel.isMultiSelect()) {
             selected_photos_container_frame.setVisibility(View.VISIBLE);
             btn_done.setText(settingsModel.completeButtonText);
 
@@ -275,7 +275,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     private void complete(final Uri uri) {
         Log.d(TAG, "selected uri: " + uri.toString());
         //uri = Uri.parse(uri.toString());
-        if (settingsModel.isMultiSelect) {
+        if (settingsModel.isMultiSelect()) {
             if (selectedUriList.contains(uri)) {
                 removeImage(uri);
             } else {
@@ -535,10 +535,10 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     public void onImagesSelected(ArrayList<Uri> uriList) {
         Fragment targetFragment = getTargetFragment();
         if (targetFragment instanceof OnMultiImageSelectedListener) {
-            ((OnMultiImageSelectedListener) targetFragment).onImagesSelected(uriList);
+            ((OnMultiImageSelectedListener) targetFragment).onImagesSelected(uriList, settingsModel.tag);
         } else {
             if (getActivity() instanceof OnMultiImageSelectedListener) {
-                ((OnMultiImageSelectedListener) getActivity()).onImagesSelected(uriList);
+                ((OnMultiImageSelectedListener) getActivity()).onImagesSelected(uriList, settingsModel.tag);
             } else {
                 throw new RuntimeException("Activity not implement onActivityResult");
             }
@@ -549,10 +549,10 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     private void returnResult(Uri uri) {
         Fragment targetFragment = getTargetFragment();
         if (targetFragment instanceof OnImageSelectedListener) {
-            ((OnImageSelectedListener) targetFragment).onImageSelected(uri);
+            ((OnImageSelectedListener) targetFragment).onImageSelected(uri, settingsModel.tag);
         } else {
             if (getActivity() instanceof OnImageSelectedListener) {
-                ((OnImageSelectedListener) getActivity()).onImageSelected(uri);
+                ((OnImageSelectedListener) getActivity()).onImageSelected(uri, settingsModel.tag);
             } else {
                 throw new RuntimeException("Activity not implement onActivityResult");
             }
@@ -566,11 +566,11 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
 
     public interface OnImageSelectedListener {
-        void onImageSelected(Uri uri);
+        void onImageSelected(Uri uri, String tag);
     }
 
     public interface OnMultiImageSelectedListener {
-        void onImagesSelected(ArrayList<Uri> uriList);
+        void onImagesSelected(ArrayList<Uri> uriList, String tag);
     }
 
     public interface ImageProvider {
