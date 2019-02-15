@@ -14,14 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-
 import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
+import gun0912.tedbottompicker.ImageLoader;
 import gun0912.tedbottompicker.R;
 import gun0912.tedbottompicker.SettingsModel;
 import gun0912.tedbottompicker.view.TedSquareFrameLayout;
@@ -86,7 +84,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                     File imageFile = new File(imageLocation);
                     pickerTiles.add(new PickerTile(Uri.fromFile(imageFile)));
                     count++;
-
                 }
             }
 
@@ -97,7 +94,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                 cursor.close();
             }
         }
-
     }
 
     public void setSelectedUriList(ArrayList<Uri> selectedUriList, Uri uri) {
@@ -142,17 +138,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
         } else {
             Uri uri = pickerTile.getImageUri();
-            if (settingsModel.imageProvider == null) {
-                Glide.with(context)
-                        .load(uri)
-                        .thumbnail(0.1f)
-                        .apply(new RequestOptions().centerCrop()
-                                .placeholder(R.drawable.ic_gallery)
-                                .error(R.drawable.img_error))
-                        .into(holder.iv_thumbnail);
-            } else {
-                settingsModel.imageProvider.onProvideImage(holder.iv_thumbnail, uri);
-            }
+            ImageLoader.loadImageInto(context, uri, holder.iv_thumbnail);
             isSelected = selectedUriList.contains(uri);
         }
 

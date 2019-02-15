@@ -34,8 +34,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.gun0912.tedonactivityresult.TedOnActivityResult;
 import com.gun0912.tedonactivityresult.listener.OnActivityResultListener;
 
@@ -274,7 +272,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
     private void complete(final Uri uri) {
         Log.d(TAG, "selected uri: " + uri.toString());
-        //uri = Uri.parse(uri.toString());
         if (settingsModel.isMultiSelect()) {
             if (selectedUriList.contains(uri)) {
                 removeImage(uri);
@@ -312,19 +309,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
         int px = (int) getResources().getDimension(R.dimen.tedbottompicker_selected_image_height);
         thumbnail.setLayoutParams(new FrameLayout.LayoutParams(px, px));
-
-        if (settingsModel.imageProvider == null) {
-            Glide.with(getActivity())
-                    .load(uri)
-                    .thumbnail(0.1f)
-                    .apply(new RequestOptions()
-                            .centerCrop()
-                            .placeholder(R.drawable.ic_gallery)
-                            .error(R.drawable.img_error))
-                    .into(thumbnail);
-        } else {
-            settingsModel.imageProvider.onProvideImage(thumbnail, uri);
-        }
+        ImageLoader.loadImageInto(getContext(), uri, thumbnail);
 
         iv_close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -564,16 +549,11 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
-
     public interface OnImageSelectedListener {
         void onImageSelected(Uri uri, String tag);
     }
 
     public interface OnMultiImageSelectedListener {
         void onImagesSelected(ArrayList<Uri> uriList, String tag);
-    }
-
-    public interface ImageProvider {
-        void onProvideImage(ImageView imageView, Uri imageUri);
     }
 }

@@ -11,8 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-
+import gun0912.tedbottompicker.ImageLoader;
 import gun0912.tedbottompicker.TedBottomPicker;
 
 public class MainFragment extends Fragment implements TedBottomPicker.OnImageSelectedListener {
@@ -66,10 +65,10 @@ public class MainFragment extends Fragment implements TedBottomPicker.OnImageSel
     @Override
     public void onImageSelected(Uri uri, String tag) {
         if(IMAGE_2_TAG.equals(tag)){
-            Glide.with(this).load(uri).into(iv_fragment_image_2);
+            ImageLoader.loadImageInto(this, uri, iv_fragment_image_2);
         }
         else {
-            Glide.with(this).load(uri).into(iv_fragment_image);
+            ImageLoader.loadImageInto(this, uri, iv_fragment_image);
         }
     }
 }

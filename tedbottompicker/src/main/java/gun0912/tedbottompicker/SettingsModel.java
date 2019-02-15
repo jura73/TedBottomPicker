@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Parcel;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
 public class SettingsModel implements Parcelable {
 
     static final String BUILDER_KEY = "BUILDER_KEY";
-    static  final int REQUEST_CODE = 912;
+    static final int REQUEST_CODE = 912;
     public int previewMaxCount = 25;
     @DrawableRes
     public int iconCamera;
@@ -36,7 +35,6 @@ public class SettingsModel implements Parcelable {
 
     int spacing = 1;
     boolean includeEdgeSpacing = false;
-    public TedBottomPicker.ImageProvider imageProvider;
     public boolean showCamera = true;
     public boolean showGallery = true;
     int peekHeight = -1;
@@ -234,11 +232,6 @@ public class SettingsModel implements Parcelable {
         return this;
     }
 
-    public SettingsModel setImageProvider(TedBottomPicker.ImageProvider imageProvider) {
-        this.imageProvider = imageProvider;
-        return this;
-    }
-
     public SettingsModel setSelectedUriList(@Nullable ArrayList<Uri> selectedUriList) {
         if (selectedUriList != null) {
             this.selectedUriList.addAll(selectedUriList);
@@ -312,7 +305,7 @@ public class SettingsModel implements Parcelable {
 
     public SettingsModel setTag(String tag) {
         this.tag = tag;
-        return  this;
+        return this;
     }
 
     @Retention(RetentionPolicy.SOURCE)

@@ -14,14 +14,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.request.RequestOptions;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 
+import gun0912.tedbottompicker.ImageLoader;
 import gun0912.tedbottompicker.TedBottomPicker;
 
 public class MainActivity extends AppCompatActivity implements TedBottomPicker.OnImageSelectedListener, TedBottomPicker.OnMultiImageSelectedListener {
@@ -29,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
     ArrayList<Uri> selectedUriList;
     Uri selectedUri;
     private ViewGroup mSelectedImagesContainer;
-    private RequestManager requestManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
 
         iv_image = (ImageView) findViewById(R.id.iv_image);
         mSelectedImagesContainer = (ViewGroup) findViewById(R.id.selected_photos_container);
-        requestManager = Glide.with(this);
         setSingleShowButton();
         setMultiShowButton();
     }
@@ -72,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
                         .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
                         .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .check();
-
             }
         });
     }
@@ -121,9 +116,7 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
             iv_image.setVisibility(View.VISIBLE);
             mSelectedImagesContainer.setVisibility(View.GONE);
 
-            requestManager
-                    .load(uri)
-                    .into(iv_image);
+            ImageLoader.loadImageInto(this, uri, iv_image);
         }
     }
 
@@ -140,15 +133,10 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
         int htpx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
 
         for (Uri uri : uriList) {
-
             View imageHolder = LayoutInflater.from(this).inflate(R.layout.image_item, null);
             ImageView thumbnail = (ImageView) imageHolder.findViewById(R.id.media_image);
 
-            requestManager
-                    .load(uri.toString())
-                    .apply(new RequestOptions().fitCenter())
-                    .into(thumbnail);
-
+            ImageLoader.loadImageInto(this, uri, thumbnail);
             mSelectedImagesContainer.addView(imageHolder);
             thumbnail.setLayoutParams(new FrameLayout.LayoutParams(wdpx, htpx));
         }
