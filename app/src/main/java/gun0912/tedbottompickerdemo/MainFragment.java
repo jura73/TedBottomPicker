@@ -65,10 +65,10 @@ public class MainFragment extends Fragment implements TedBottomPicker.OnImageSel
     @Override
     public void onImageSelected(Uri uri, String tag) {
         if(IMAGE_2_TAG.equals(tag)){
-            ImageLoader.loadImageInto(this, uri, iv_fragment_image_2);
+            ImageLoader.loadImageInto(getActivity(), uri, iv_fragment_image_2);
         }
         else {
-            ImageLoader.loadImageInto(this, uri, iv_fragment_image);
+            ImageLoader.loadImageInto(getActivity(), uri, iv_fragment_image);
         }
     }
 }
