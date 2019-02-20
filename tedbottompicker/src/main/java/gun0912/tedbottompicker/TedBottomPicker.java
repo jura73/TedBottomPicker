@@ -53,8 +53,6 @@ import gun0912.tedbottompicker.util.RealPathUtil;
 public class TedBottomPicker extends BottomSheetDialogFragment {
 
     public static final String TAG = "TedBottomPicker";
-    static final String EXTRA_CAMERA_IMAGE_URI = "camera_image_uri";
-    static final String EXTRA_CAMERA_SELECTED_IMAGE_URI = "camera_selected_image_uri";
     static final int PERMISSION_WRITE_TO_STORAGE = 1231;
 
     public SettingsModel settingsModel = new SettingsModel();
@@ -67,8 +65,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
     TextView selected_photos_empty;
     View contentView;
-    ArrayList<Uri> selectedUriList;
-    private Uri cameraImageUri;
     private RecyclerView rc_gallery;
     private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
         @Override
@@ -100,21 +96,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        extractArgument();
-        setupSavedInstanceState(savedInstanceState);
-    }
-
-    private void setupSavedInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            cameraImageUri = settingsModel.selectedUri;
-            selectedUriList = settingsModel.selectedUriList;
-        } else {
-            cameraImageUri = savedInstanceState.getParcelable(EXTRA_CAMERA_IMAGE_URI);
-            selectedUriList = savedInstanceState.getParcelableArrayList(EXTRA_CAMERA_SELECTED_IMAGE_URI);
-        }
-    }
-
-    void extractArgument() {
         if (getArguments() != null && getArguments().containsKey(SettingsModel.BUILDER_KEY)) {
             settingsModel = getArguments().getParcelable(SettingsModel.BUILDER_KEY);
         }
@@ -122,8 +103,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(EXTRA_CAMERA_IMAGE_URI, cameraImageUri);
-        outState.putParcelableArrayList(EXTRA_CAMERA_SELECTED_IMAGE_URI, selectedUriList);
         outState.putParcelable(SettingsModel.BUILDER_KEY, settingsModel);
         super.onSaveInstanceState(outState);
     }
@@ -166,7 +145,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         setDoneButton();
 
         if (settingsModel.isMultiSelect()) {
-            for (Uri uri : selectedUriList) {
+            for (Uri uri : settingsModel.selectedUriList) {
                 addUrlToGallery(uri);
             }
         }
@@ -212,7 +191,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
     private void onMultiSelectComplete() {
 
-        if (selectedUriList.size() < settingsModel.selectMinCount) {
+        if (settingsModel.selectedUriList.size() < settingsModel.selectMinCount) {
             String message;
             if (settingsModel.selectMinCountErrorText != null) {
                 message = settingsModel.selectMinCountErrorText;
@@ -224,7 +203,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
             return;
         }
 
-        onImagesSelected(selectedUriList);
+        onImagesSelected(settingsModel.selectedUriList);
         dismissAllowingStateLoss();
     }
 
@@ -277,7 +256,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     private void complete(final Uri uri) {
         Log.d(TAG, "selected uri: " + uri.toString());
         if (settingsModel.isMultiSelect()) {
-            if (selectedUriList.contains(uri)) {
+            if (settingsModel.selectedUriList.contains(uri)) {
                 removeImage(uri);
             } else {
                 addUri(uri);
@@ -288,7 +267,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     }
 
     private void addUri(final Uri uri) {
-        if (selectedUriList.size() == settingsModel.selectMaxCount) {
+        if (settingsModel.selectedUriList.size() == settingsModel.selectMaxCount) {
             String message;
             if (settingsModel.selectMaxCountErrorText != null) {
                 message = settingsModel.selectMaxCountErrorText;
@@ -299,7 +278,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
             Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
         }
 
-        selectedUriList.add(uri);
+        settingsModel.selectedUriList.add(uri);
         addUrlToGallery(uri);
     }
 
@@ -326,7 +305,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     }
 
     private void removeImage(Uri uri) {
-        selectedUriList.remove(uri);
+        settingsModel.selectedUriList.remove(uri);
         for (int i = 0; i < selected_photos_container.getChildCount(); i++) {
             View childView = selected_photos_container.getChildAt(i);
             if (childView.getTag().equals(uri)) {
@@ -339,11 +318,11 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
     private void updateGallery(Uri uri) {
         updateSelectedView();
-        imageGalleryAdapter.setSelectedUriList(selectedUriList, uri);
+        imageGalleryAdapter.setSelectedUriList(settingsModel.selectedUriList, uri);
     }
 
     private void updateSelectedView() {
-        if (selectedUriList == null || selectedUriList.size() == 0) {
+        if (settingsModel.selectedUriList == null || settingsModel.selectedUriList.size() == 0) {
             selected_photos_empty.setVisibility(View.VISIBLE);
             selected_photos_container.setVisibility(View.GONE);
         } else {
@@ -385,7 +364,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
                     @Override
                     public void onActivityResult(int resultCode, Intent data) {
                         if (resultCode == Activity.RESULT_OK) {
-                            onActivityResultCamera(cameraImageUri);
+                            onActivityResultCamera(settingsModel.selectedUri);
                         }
                     }
                 })
@@ -410,7 +389,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
             );
 
             // Save a file: path for use with ACTION_VIEW intents
-            cameraImageUri = Uri.fromFile(imageFile);
+            settingsModel.selectedUri = Uri.fromFile(imageFile);
         } catch (IOException e) {
             e.printStackTrace();
             onError("Could not create imageFile for camera");
@@ -436,7 +415,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
             );
 
             // Save a file: path for use with ACTION_VIEW intents
-            cameraImageUri = Uri.fromFile(videoFile);
+            settingsModel.selectedUri = Uri.fromFile(videoFile);
         } catch (IOException e) {
             e.printStackTrace();
             onError("Could not create imageFile for camera");
