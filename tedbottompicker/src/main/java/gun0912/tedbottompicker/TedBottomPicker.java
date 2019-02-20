@@ -100,17 +100,8 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkPermission();
         extractArgument();
         setupSavedInstanceState(savedInstanceState);
-    }
-
-    private void checkPermission() {
-        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        if (ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED) {
-            String[] permissions = {permission};
-            requestPermissions(permissions, PERMISSION_WRITE_TO_STORAGE);
-        }
     }
 
     private void setupSavedInstanceState(Bundle savedInstanceState) {
@@ -149,6 +140,13 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         super.setupDialog(dialog, style);
         contentView = View.inflate(getContext(), R.layout.tedbottompicker_content_view, null);
         dialog.setContentView(contentView);
+
+        if (permissionNotProvided()) {
+            contentView.setVisibility(View.GONE);
+            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            requestPermissions(permissions, PERMISSION_WRITE_TO_STORAGE);
+        }
+
         CoordinatorLayout.LayoutParams layoutParams =
                 (CoordinatorLayout.LayoutParams) ((View) contentView.getParent()).getLayoutParams();
         CoordinatorLayout.Behavior behavior = layoutParams.getBehavior();
@@ -172,6 +170,10 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
                 addUrlToGallery(uri);
             }
         }
+    }
+
+    private boolean permissionNotProvided() {
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
     }
 
     private void setTitle() {
@@ -521,6 +523,9 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         if (requestCode == PERMISSION_WRITE_TO_STORAGE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (contentView != null) {
+                    contentView.setVisibility(View.VISIBLE);
+                }
                 setRecyclerView();
             } else {
                 dismissAllowingStateLoss();
