@@ -1,6 +1,5 @@
 package gun0912.tedbottompickerdemo;
 
-import android.Manifest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
-
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 
@@ -41,12 +36,10 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
 
     private void setSingleShowButton() {
         Button btn_single_show = (Button) findViewById(R.id.btn_single_show);
-        btn_single_show.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PermissionListener permissionlistener = new PermissionListener() {
+        btn_single_show.setOnClickListener(
+                new View.OnClickListener() {
                     @Override
-                    public void onPermissionGranted() {
+                    public void onClick(View view) {
                         TedBottomPicker bottomSheetDialogFragment = TedBottomPicker.Builder()
                                 //.setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
                                 .setSelectedUri(selectedUri)
@@ -56,20 +49,8 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
 
                         bottomSheetDialogFragment.show(getSupportFragmentManager());
                     }
-
-                    @Override
-                    public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                        Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                };
-
-                TedPermission.with(MainActivity.this)
-                        .setPermissionListener(permissionlistener)
-                        .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
-                        .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        .check();
-            }
-        });
+                }
+        );
     }
 
     private void setMultiShowButton() {
@@ -78,31 +59,15 @@ public class MainActivity extends AppCompatActivity implements TedBottomPicker.O
         btn_multi_show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PermissionListener permissionlistener = new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted() {
-                        TedBottomPicker bottomSheetDialogFragment = TedBottomPicker.Builder()
-                                .setPeekHeight(getResources().getDisplayMetrics().heightPixels / 2)
+                TedBottomPicker bottomSheetDialogFragment = TedBottomPicker.Builder()
+                        .setPeekHeight(getResources().getDisplayMetrics().heightPixels / 2)
 //                                .setPeekHeight(1600)
-                                .setCompleteButtonText(R.string.btn_done)
-                                .setEmptySelectionText("No Select")
-                                .setSelectedUriList(selectedUriList)
-                                .createMultiSelect(MainActivity.this);
+                        .setCompleteButtonText(R.string.btn_done)
+                        .setEmptySelectionText("No Select")
+                        .setSelectedUriList(selectedUriList)
+                        .createMultiSelect(MainActivity.this);
 
-                        bottomSheetDialogFragment.show(getSupportFragmentManager());
-                    }
-
-                    @Override
-                    public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                        Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                };
-
-                TedPermission.with(MainActivity.this)
-                        .setPermissionListener(permissionlistener)
-                        .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
-                        .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        .check();
+                bottomSheetDialogFragment.show(getSupportFragmentManager());
             }
         });
     }

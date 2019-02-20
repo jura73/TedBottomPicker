@@ -1,11 +1,7 @@
 package gun0912.tedbottompicker;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorRes;
@@ -15,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -250,19 +245,16 @@ public class SettingsModel implements Parcelable {
     }
 
     public TedBottomPicker create(@NonNull Activity activity) {
-        checkPermission(activity);
         checkImplementationOnImageSelected(activity);
         return TedBottomPicker.newInstance(this);
     }
 
     public TedBottomPicker createMultiSelect(@NonNull Activity activity) {
-        checkPermission(activity);
         setMultiSelect(activity);
         return TedBottomPicker.newInstance(this);
     }
 
     public TedBottomPicker create(@NonNull Fragment fragment) {
-        checkPermission(fragment.getContext());
         checkImplementationOnImageSelected(fragment);
 
         TedBottomPicker tedBottomPicker = TedBottomPicker.newInstance(this);
@@ -271,7 +263,6 @@ public class SettingsModel implements Parcelable {
     }
 
     public TedBottomPicker createMultiSelect(@NonNull Fragment fragment) {
-        checkPermission(fragment.getContext());
         setMultiSelect(fragment);
 
         TedBottomPicker tedBottomPicker = TedBottomPicker.newInstance(this);
@@ -282,13 +273,6 @@ public class SettingsModel implements Parcelable {
     private void setMultiSelect(@NonNull Object object) {
         checkImplementationMultiImageSelected(object);
         isMultiSelect = true;
-    }
-
-    private void checkPermission(@NonNull Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-                && ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            throw new RuntimeException("Missing required WRITE_EXTERNAL_STORAGE permission. Did you remember to request it first?");
-        }
     }
 
     private void checkImplementationOnImageSelected(@NonNull Object object) {

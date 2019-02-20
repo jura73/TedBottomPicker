@@ -1,5 +1,6 @@
 package gun0912.tedbottompicker;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -19,6 +20,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -53,6 +55,8 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     public static final String TAG = "TedBottomPicker";
     static final String EXTRA_CAMERA_IMAGE_URI = "camera_image_uri";
     static final String EXTRA_CAMERA_SELECTED_IMAGE_URI = "camera_selected_image_uri";
+    static final int PERMISSION_WRITE_TO_STORAGE = 1231;
+
     public SettingsModel settingsModel = new SettingsModel();
     GalleryAdapter imageGalleryAdapter;
     TextView tv_title;
@@ -96,8 +100,17 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        checkPermission();
         extractArgument();
         setupSavedInstanceState(savedInstanceState);
+    }
+
+    private void checkPermission() {
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if (ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+            String[] permissions = {permission};
+            requestPermissions(permissions, PERMISSION_WRITE_TO_STORAGE);
+        }
     }
 
     private void setupSavedInstanceState(Bundle savedInstanceState) {
@@ -125,20 +138,9 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     }
 
     public void show(FragmentManager fragmentManager) {
-
         FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.add(this, getTag());
         ft.commitAllowingStateLoss();
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return super.onCreateDialog(savedInstanceState);
-    }
-
-    @Override
-    public void onViewCreated(View contentView, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(contentView, savedInstanceState);
     }
 
     @SuppressLint("RestrictedApi")
@@ -511,6 +513,19 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
             selectedImageUri = Uri.parse(realPath);
         }
         complete(selectedImageUri);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[]
+            grantResults) {
+        if (requestCode == PERMISSION_WRITE_TO_STORAGE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setRecyclerView();
+            } else {
+                dismissAllowingStateLoss();
+            }
+        }
     }
 
     public void onImageSelected(Uri uri) {
