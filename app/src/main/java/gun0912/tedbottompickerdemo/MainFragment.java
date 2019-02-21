@@ -35,9 +35,7 @@ public class MainFragment extends Fragment implements TedBottomPicker.OnImageSel
         btn_single_show.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TedBottomPicker bottomSheetDialogFragment = TedBottomPicker.Builder()
-                        .setPeekHeight(getResources().getDisplayMetrics().heightPixels/2)
-                        .create(MainFragment.this);
+                TedBottomPicker bottomSheetDialogFragment = TedBottomPicker.Builder().create(MainFragment.this);
                 bottomSheetDialogFragment.show(getFragmentManager());
             }
         });

@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -15,8 +14,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import java.io.File;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 import gun0912.tedbottompicker.ImageLoader;
@@ -44,11 +41,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         selectedUriList = new ArrayList<>();
 
         if (settingsModel.showCamera) {
-            pickerTiles.add(new PickerTile(PickerTile.CAMERA));
+            pickerTiles.add(new PickerTile(PickerTile.TitleType.CAMERA));
         }
 
         if (settingsModel.showGallery) {
-            pickerTiles.add(new PickerTile(PickerTile.GALLERY));
+            pickerTiles.add(new PickerTile(PickerTile.TitleType.GALLERY));
         }
 
         Cursor cursor = null;
@@ -105,7 +102,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         PickerTile pickerTile;
         for (int i = 0; i < pickerTiles.size(); i++) {
             pickerTile = pickerTiles.get(i);
-            if (pickerTile.isImageTile() && pickerTile.getImageUri().equals(uri)) {
+            if (pickerTile.tileType == PickerTile.TitleType.IMAGE && pickerTile.getImageUri().equals(uri)) {
                 position = i;
                 break;
             }
@@ -129,17 +126,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
         boolean isSelected = false;
 
-        if (pickerTile.isCameraTile()) {
-            holder.iv_thumbnail.setBackgroundResource(settingsModel.cameraTileBackgroundResId);
-            holder.iv_thumbnail.setImageResource(settingsModel.iconCamera);
-        } else if (pickerTile.isGalleryTile()) {
-            holder.iv_thumbnail.setBackgroundResource(settingsModel.galleryTileBackgroundResId);
-            holder.iv_thumbnail.setImageResource(settingsModel.iconGallery);
-
-        } else {
-            Uri uri = pickerTile.getImageUri();
-            ImageLoader.loadImageInto(context, uri, holder.iv_thumbnail);
-            isSelected = selectedUriList.contains(uri);
+        switch (pickerTile.getTileType()) {
+            case CAMERA:
+                holder.iv_thumbnail.setBackgroundResource(settingsModel.cameraTileBackgroundResId);
+                holder.iv_thumbnail.setImageResource(settingsModel.iconCamera);
+                break;
+            case GALLERY:
+                holder.iv_thumbnail.setBackgroundResource(settingsModel.galleryTileBackgroundResId);
+                holder.iv_thumbnail.setImageResource(settingsModel.iconGallery);
+                break;
+            default:
+                Uri uri = pickerTile.getImageUri();
+                ImageLoader.loadImageInto(context, uri, holder.iv_thumbnail);
+                isSelected = selectedUriList.contains(uri);
         }
 
         if (holder.root instanceof FrameLayout) {
@@ -180,24 +179,24 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
     public static class PickerTile {
 
-        public static final int IMAGE = 1;
-        public static final int CAMERA = 2;
-        public static final int GALLERY = 3;
-        protected final Uri imageUri;
-        @TileType
-        protected final int tileType;
+        public enum TitleType {
+            IMAGE, CAMERA, GALLERY
+        }
 
-        PickerTile(@SpecialTileType int tileType) {
+        final Uri imageUri;
+        final TitleType tileType;
+
+        PickerTile(TitleType tileType) {
             this(null, tileType);
         }
 
-        protected PickerTile(@Nullable Uri imageUri, @TileType int tileType) {
+        PickerTile(@Nullable Uri imageUri, TitleType tileType) {
             this.imageUri = imageUri;
             this.tileType = tileType;
         }
 
         PickerTile(@NonNull Uri imageUri) {
-            this(imageUri, IMAGE);
+            this(imageUri, TitleType.IMAGE);
         }
 
         @Nullable
@@ -205,44 +204,16 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             return imageUri;
         }
 
-        @TileType
-        public int getTileType() {
+        public TitleType getTileType() {
             return tileType;
         }
 
         @Override
         public String toString() {
-            if (isImageTile()) {
-                return "ImageTile: " + imageUri;
-            } else if (isCameraTile()) {
-                return "CameraTile";
-            } else if (isGalleryTile()) {
-                return "PickerTile";
-            } else {
-                return "Invalid item";
+            if (imageUri != null) {
+                return tileType.toString() + ": " + imageUri;
             }
-        }
-
-        public boolean isImageTile() {
-            return tileType == IMAGE;
-        }
-
-        public boolean isCameraTile() {
-            return tileType == CAMERA;
-        }
-
-        public boolean isGalleryTile() {
-            return tileType == GALLERY;
-        }
-
-        @IntDef({IMAGE, CAMERA, GALLERY})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface TileType {
-        }
-
-        @IntDef({CAMERA, GALLERY})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface SpecialTileType {
+            return tileType.toString();
         }
     }
 

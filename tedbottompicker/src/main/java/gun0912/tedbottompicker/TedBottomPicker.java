@@ -253,13 +253,13 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
                 GalleryAdapter.PickerTile pickerTile = imageGalleryAdapter.getItem(position);
 
                 switch (pickerTile.getTileType()) {
-                    case GalleryAdapter.PickerTile.CAMERA:
+                    case CAMERA:
                         startCameraIntent();
                         break;
-                    case GalleryAdapter.PickerTile.GALLERY:
+                    case GALLERY:
                         startGalleryIntent();
                         break;
-                    case GalleryAdapter.PickerTile.IMAGE:
+                    case IMAGE:
                         complete(pickerTile.getImageUri());
                         break;
                     default:
