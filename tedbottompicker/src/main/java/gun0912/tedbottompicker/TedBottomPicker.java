@@ -54,7 +54,9 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
     public static final String TAG = "TedBottomPicker";
     static final int PERMISSION_WRITE_TO_STORAGE = 1231;
+    static final int REQUEST_CODE = 912;
 
+    @NonNull
     public SettingsModel settingsModel = new SettingsModel();
     GalleryAdapter imageGalleryAdapter;
     TextView tv_title;
@@ -85,6 +87,12 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         return new SettingsModel();
     }
 
+    public static TedBottomPicker newInstance(SettingsModel settingsModel, Fragment targetFragment) {
+        TedBottomPicker tedBottomPicker = newInstance(settingsModel);
+        tedBottomPicker.setTargetFragment(targetFragment, REQUEST_CODE);
+        return tedBottomPicker;
+    }
+
     public static TedBottomPicker newInstance(SettingsModel settingsModel) {
         TedBottomPicker tedBottomPicker = new TedBottomPicker();
         Bundle bundle = new Bundle();
@@ -97,7 +105,16 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null && getArguments().containsKey(SettingsModel.BUILDER_KEY)) {
-            settingsModel = getArguments().getParcelable(SettingsModel.BUILDER_KEY);
+            SettingsModel model = getArguments().getParcelable(SettingsModel.BUILDER_KEY);
+            if (model != null) {
+                settingsModel = model;
+            }
+        }
+
+        if (settingsModel.isMultiSelect()) {
+           checkImplementationMultiImageSelected();
+        } else {
+            checkImplementationOnImageSelected();
         }
     }
 
@@ -204,7 +221,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         }
 
         onImagesSelected(settingsModel.selectedUriList);
-        dismissAllowingStateLoss();
     }
 
     private void initView(View contentView) {
@@ -247,7 +263,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
                         complete(pickerTile.getImageUri());
                         break;
                     default:
-                        errorMessage();
+                        onError("Error");
                 }
             }
         });
@@ -262,7 +278,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
                 addUri(uri);
             }
         } else {
-            onImageSelected(uri);
+            returnResult(uri);
         }
     }
 
@@ -453,10 +469,6 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
                 .startActivityForResult();
     }
 
-    private void errorMessage() {
-        onError("Error");
-    }
-
     private void onActivityResultCamera(final Uri cameraImageUri) {
 
         MediaScannerConnection.scanFile(getContext(), new String[]{cameraImageUri.getPath()}, new String[]{"image/jpeg"}, new MediaScannerConnection.MediaScannerConnectionClient() {
@@ -482,12 +494,12 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         Uri temp = data.getData();
 
         if (temp == null) {
-            errorMessage();
+            onError("onActivityResultGallery Uri is null");
         }
 
         String realPath = RealPathUtil.getRealPath(getActivity(), temp);
 
-        Uri selectedImageUri = null;
+        Uri selectedImageUri;
         try {
             selectedImageUri = Uri.fromFile(new File(realPath));
         } catch (Exception ex) {
@@ -512,40 +524,54 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         }
     }
 
-    public void onImageSelected(Uri uri) {
-        returnResult(uri);
-    }
-
     public void onImagesSelected(ArrayList<Uri> uriList) {
-        Fragment targetFragment = getTargetFragment();
-        if (targetFragment instanceof OnMultiImageSelectedListener) {
-            ((OnMultiImageSelectedListener) targetFragment).onImagesSelected(uriList, settingsModel.tag);
-        } else {
-            if (getActivity() instanceof OnMultiImageSelectedListener) {
-                ((OnMultiImageSelectedListener) getActivity()).onImagesSelected(uriList, settingsModel.tag);
-            } else {
-                throw new RuntimeException("Activity not implement onActivityResult");
-            }
-        }
+        getOnMultiImageSelectedListener().onImagesSelected(uriList, settingsModel.tag);
         dismissAllowingStateLoss();
     }
 
     private void returnResult(Uri uri) {
+        getOnImageSelectedListener().onImageSelected(uri, settingsModel.tag);
+        dismissAllowingStateLoss();
+    }
+
+    @Nullable
+    private OnImageSelectedListener getOnImageSelectedListener() {
         Fragment targetFragment = getTargetFragment();
         if (targetFragment instanceof OnImageSelectedListener) {
-            ((OnImageSelectedListener) targetFragment).onImageSelected(uri, settingsModel.tag);
-        } else {
-            if (getActivity() instanceof OnImageSelectedListener) {
-                ((OnImageSelectedListener) getActivity()).onImageSelected(uri, settingsModel.tag);
-            } else {
-                throw new RuntimeException("Activity not implement onActivityResult");
-            }
+            return ((OnImageSelectedListener) targetFragment);
         }
-        dismissAllowingStateLoss();
+        if (getActivity() instanceof OnImageSelectedListener) {
+            return ((OnImageSelectedListener) getActivity());
+        }
+        return null;
+    }
+
+    @Nullable
+    private OnMultiImageSelectedListener getOnMultiImageSelectedListener() {
+        Fragment targetFragment = getTargetFragment();
+        if (targetFragment instanceof OnMultiImageSelectedListener) {
+            return ((OnMultiImageSelectedListener) targetFragment);
+        }
+        if (getActivity() instanceof OnMultiImageSelectedListener) {
+            return ((OnMultiImageSelectedListener) getActivity());
+        }
+        return null;
     }
 
     public void onError(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    public void checkImplementationOnImageSelected() {
+        if (getOnImageSelectedListener() == null) {
+            throw new RuntimeException("You have implementation OnImageSelectedListener for receive selected Uri");
+        }
+    }
+
+    public void checkImplementationMultiImageSelected() {
+        if (getOnMultiImageSelectedListener() == null) {
+            throw new RuntimeException("You have implementation OnMultiImageSelectedListener for receive selected Uri");
+        }
     }
 
     public interface OnImageSelectedListener {

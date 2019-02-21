@@ -19,7 +19,6 @@ import java.util.ArrayList;
 public class SettingsModel implements Parcelable {
 
     static final String BUILDER_KEY = "BUILDER_KEY";
-    static final int REQUEST_CODE = 912;
     public int previewMaxCount = 25;
     @DrawableRes
     public int iconCamera;
@@ -245,46 +244,25 @@ public class SettingsModel implements Parcelable {
     }
 
     public TedBottomPicker create(@NonNull Activity activity) {
-        checkImplementationOnImageSelected(activity);
         return TedBottomPicker.newInstance(this);
     }
 
     public TedBottomPicker createMultiSelect(@NonNull Activity activity) {
-        setMultiSelect(activity);
+        setMultiSelect();
         return TedBottomPicker.newInstance(this);
     }
 
     public TedBottomPicker create(@NonNull Fragment fragment) {
-        checkImplementationOnImageSelected(fragment);
-
-        TedBottomPicker tedBottomPicker = TedBottomPicker.newInstance(this);
-        tedBottomPicker.setTargetFragment(fragment, REQUEST_CODE);
-        return tedBottomPicker;
+        return TedBottomPicker.newInstance(this, fragment);
     }
 
     public TedBottomPicker createMultiSelect(@NonNull Fragment fragment) {
-        setMultiSelect(fragment);
-
-        TedBottomPicker tedBottomPicker = TedBottomPicker.newInstance(this);
-        tedBottomPicker.setTargetFragment(fragment, REQUEST_CODE);
-        return tedBottomPicker;
+        setMultiSelect();
+        return TedBottomPicker.newInstance(this, fragment);
     }
 
-    private void setMultiSelect(@NonNull Object object) {
-        checkImplementationMultiImageSelected(object);
+    private void setMultiSelect() {
         isMultiSelect = true;
-    }
-
-    private void checkImplementationOnImageSelected(@NonNull Object object) {
-        if (!(object instanceof TedBottomPicker.OnImageSelectedListener)) {
-            throw new RuntimeException("You have implementation OnImageSelectedListener for receive selected Uri");
-        }
-    }
-
-    private void checkImplementationMultiImageSelected(@NonNull Object object) {
-        if (!(object instanceof TedBottomPicker.OnMultiImageSelectedListener)) {
-            throw new RuntimeException("You have implementation OnMultiImageSelectedListener for receive selected Uri");
-        }
     }
 
     public SettingsModel setTag(String tag) {
