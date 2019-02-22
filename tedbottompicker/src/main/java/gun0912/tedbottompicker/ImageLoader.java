@@ -15,6 +15,8 @@ public class ImageLoader {
         Picasso.get().load(imageUri)
                 .placeholder(R.drawable.ic_gallery)
                 .error(R.drawable.img_error)
+                .fit()
+                .centerCrop()
                 .into(imageView);
     }
 
