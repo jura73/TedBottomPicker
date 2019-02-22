@@ -1,9 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-
     compileSdkVersion 27
-
 
     defaultConfig {
         applicationId "gun0912.tedbottompickerdemo"
@@ -26,8 +24,6 @@ android {
 
 
 repositories {
-
-
 }
 
 dependencies {
@@ -35,8 +31,4 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:27.1.1'
     compile project(':tedbottompicker')
-
-    compile 'gun0912.ted:tedpermission:2.2.0'
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 }
