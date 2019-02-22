@@ -112,7 +112,7 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
         }
 
         if (settingsModel.isMultiSelect()) {
-           checkImplementationMultiImageSelected();
+            checkImplementationMultiImageSelected();
         } else {
             checkImplementationOnImageSelected();
         }
@@ -509,11 +509,10 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[]
-            grantResults) {
-        if (requestCode == PERMISSION_WRITE_TO_STORAGE) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_WRITE_TO_STORAGE && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (contentView != null) {
                     contentView.setVisibility(View.VISIBLE);
                 }
