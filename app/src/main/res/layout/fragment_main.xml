@@ -17,7 +17,9 @@
         android:id="@+id/iv_fragment_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_vertical_margin" />
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:adjustViewBounds="true"
+        android:src="@mipmap/pexel_sphoto248797" />
 
     <Button
         android:id="@+id/btn_fragment_single_show_2"
@@ -29,5 +31,6 @@
         android:id="@+id/iv_fragment_image_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@mipmap/pexel_sphoto248797"
         android:layout_marginTop="@dimen/activity_vertical_margin" />
 </LinearLayout>
