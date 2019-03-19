@@ -441,14 +441,10 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
 
     private void startGalleryIntent() {
         Intent galleryIntent;
-        Uri uri;
         if (settingsModel.mediaType == SettingsModel.MediaType.IMAGE) {
             galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            //  galleryIntent.setType("image/*");// TODO check
         } else {
             galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-            //   galleryIntent.setType("video/*");// TODO check
-
         }
 
         if (galleryIntent.resolveActivity(getActivity().getPackageManager()) == null) {
@@ -491,21 +487,22 @@ public class TedBottomPicker extends BottomSheetDialogFragment {
     }
 
     private void onActivityResultGallery(Intent data) {
-        Uri temp = data.getData();
+        Uri selectedImageUri = data.getData();
 
-        if (temp == null) {
+        if (selectedImageUri == null) {
             onError("onActivityResultGallery Uri is null");
         }
-
-        String realPath = RealPathUtil.getRealPath(getActivity(), temp);
-
-        Uri selectedImageUri;
-        try {
-            selectedImageUri = Uri.fromFile(new File(realPath));
-        } catch (Exception ex) {
-            selectedImageUri = Uri.parse(realPath);
+        else {
+            String realPath = RealPathUtil.getRealPath(getActivity(), selectedImageUri);
+            if (!TextUtils.isEmpty(realPath)) {
+                try {
+                    selectedImageUri = Uri.fromFile(new File(realPath));
+                } catch (Exception ex) {
+                    selectedImageUri = Uri.parse(realPath);
+                }
+            }
+            complete(selectedImageUri);
         }
-        complete(selectedImageUri);
     }
 
     @Override

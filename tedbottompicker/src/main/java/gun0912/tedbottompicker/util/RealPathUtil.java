@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 
 /**
  * Created by TedPark on 2016. 11. 5..
@@ -17,6 +18,7 @@ import android.provider.MediaStore;
 
 public class RealPathUtil {
 
+    @Nullable
     public static String getRealPath(Context context, Uri uri) {
         String realPath;
         // SDK < API11
@@ -37,6 +39,7 @@ public class RealPathUtil {
         return realPath;
     }
 
+    @Nullable
     @SuppressLint("NewApi")
     public static String getRealPathFromURI_API19(final Context context, final Uri uri) {
 
