@@ -1,8 +1,3 @@
-
-# Description not for this repository
-
-# Description Of ParkSangGwon/TedBottomPicker
-
 # What is TedBottomPicker?
 In Google's Material Design, Google introduce **Bottom sheets**.([Components – Bottom sheets](https://material.google.com/components/bottom-sheets.html))<br/>
 **Bottom sheets** slide up from the bottom of the screen to reveal more content.
@@ -20,7 +15,6 @@ If you want pick image from gallery or take picture, this library can help easil
 <br/><br/>
 
 
-
 ## Demo
 <br/><br/>
 1. Show Bottom Sheet.
@@ -32,18 +26,14 @@ If you want pick image from gallery or take picture, this library can help easil
 ![Screenshot](https://github.com/ParkSangGwon/TedBottomPicker/blob/master/screenshot_multi_select.jpeg?raw=true)    
 
            
-
-
-
-
 ## Setup
 
 
 ### Gradle
-[ ![Download](https://api.bintray.com/packages/tkdrnjs0912/maven/tedbottompicker/images/download.svg) ](https://bintray.com/tkdrnjs0912/maven/tedbottompicker/_latestVersion)
+[![](https://jitpack.io/v/jura73/TedBottomPicker.svg)](https://jitpack.io/#jura73/TedBottomPicker)
 ```javascript
 dependencies {
-    implementation 'gun0912.ted:tedbottompicker:x.y.z'
+    implementation 'com.github.jura73:TedBottomPicker:x.y.z'
 }
 
 ```
@@ -74,38 +64,25 @@ After then, you can show TedBottomPicker<br/>
 
 ```javascript
 
-     TedBottomPicker tedBottomPicker = new TedBottomPicker.Builder(MainActivity.this)
-                                .setOnImageSelectedListener(new TedBottomPicker.OnImageSelectedListener() {
-                                    @Override
-                                    public void onImageSelected(Uri uri) {
-                                        // here is selected uri
-                                    }
-                                })
-                                .create();
+     TedBottomPicker tedBottomPicker = new TedBottomPicker.Builder()
+                                .create(MainActivity.this);
 
      tedBottomPicker.show(getSupportFragmentManager());
 ```
 
-If you want select multi image, you can use `OnMultiImageSelectedListener`
+If you want select multi image, you can use `createMultiSelect`
 ```javascript
- TedBottomPicker bottomSheetDialogFragment = new TedBottomPicker.Builder(MainActivity.this)
-                               .setOnMultiImageSelectedListener(new TedBottomPicker.OnMultiImageSelectedListener() {
-                                   @Override
-                                   public void onImagesSelected(ArrayList<Uri> uriList) {
-                                       // here is selected uri list
-                                   }
-                               })
+ TedBottomPicker bottomSheetDialogFragment = new TedBottomPicker.Builder()
                                 .setPeekHeight(1600)
-                                .showTitle(false)
                                 .setCompleteButtonText("Done")
                                 .setEmptySelectionText("No Select")
-                                .create();
+                                .createMultiSelect(MainActivity.this);
 
                         bottomSheetDialogFragment.show(getSupportFragmentManager());
 ```
 
 **Don't forget!!**<br/>
-You have to declare `setOnImageSelectedListener()` or `OnMultiImageSelectedListener()` in Builder.<br/>
+You have to implements `TedBottomPicker.OnImageSelectedListener` or `TedBottomPicker.OnMultiImageSelectedListener` in Activity or Fragment.<br/>
 This listener will pass selected Uri/UriList.<br/>
 
 
@@ -123,11 +100,11 @@ You can customize something ...<br />
 * `showVideoMedia()` : Not only load image, but also load video
 * `setPreviewMaxCount(Int) (default: 25)`
 * `setPeekHeight(Int)`
-* `setPeekHeightResId(R.dimen.xxx)`
+* <strike>setPeekHeightResId(R.dimen.xxx)</strike>
 * `showCameraTile(Boolean) (default: true)`
-* `setCameraTile(R.drawable.xxx or Drawable)`
-* `setCameraTileBackgroundResId(R.color.xxx)`
-* `setGalleryTile(R.drawable.xxx or Drawable)`
+* <strike>setCameraTile(R.drawable.xxx or Drawable)</strike>
+* <strike>setCameraTileBackgroundResId(R.color.xxx)</strike>
+* <strike>setGalleryTile(R.drawable.xxx or Drawable)</strike>
 * `showGalleryTile(Boolean) (default: true)`
 * `setGalleryTileBackgroundResId(R.color.xxx)`
 * `setSpacing(Int)`
